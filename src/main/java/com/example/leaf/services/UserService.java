@@ -1,5 +1,6 @@
 package com.example.leaf.services;
 
+import com.example.leaf.dto.request.ChangePasswordRequestDTO;
 import com.example.leaf.dto.request.UserRequestDTO;
 import com.example.leaf.dto.response.ResponseObject;
 import com.example.leaf.dto.response.UserResponseDTO;
@@ -20,6 +21,7 @@ public interface UserService {
     ResponseEntity<ResponseObject> saveUser(UserRequestDTO userRequestDTO, String siteUrl)
             throws MessagingException, UnsupportedEncodingException;
     ResponseEntity<ResponseObject> updateUser(Long id, UserRequestDTO userRequestDTO);
+    ResponseEntity<ResponseObject> changePassword(Long id, ChangePasswordRequestDTO changePasswordRequestDTO);
     ResponseEntity<UserResponseDTO> getUserById(Long id);
     ResponseEntity<ResponseObject> verifyUser(String verifyCode);
 }

@@ -1,5 +1,6 @@
 package com.example.leaf.dto.request;
 
+import com.example.leaf.entities.Address;
 import com.example.leaf.entities.enums.Gender;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,7 +28,7 @@ public class UserRequestDTO {
     @Size(message="Invalid size.", max = 10, min=10)
     @Pattern(regexp=("^0\\d{9}$"), message = "Invalid phone")
     private String phone;
-    private String address;
+    private Address address;
     private String birthday;
     private Gender gender;
     private String nickname;

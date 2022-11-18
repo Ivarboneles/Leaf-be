@@ -27,7 +27,6 @@ public interface UserMapper {
     @Mapping(target = "id", source = "user.id")
     @Mapping(target = "name", source = "user.name")
     @Mapping(target = "username", source = "user.username")
-    @Mapping(target = "password", source = "user.password")
     @Mapping(target = "email", source = "user.email")
     @Mapping(target = "phone", source = "user.phone")
     @Mapping(target = "address", source = "user.address")
@@ -35,8 +34,8 @@ public interface UserMapper {
     @Mapping(target = "gender", source = "user.gender")
     @Mapping(target = "nickname", source = "user.nickname")
     @Mapping(target = "bio", source = "user.bio")
-    @Mapping(target = "avatar", expression = "java(null)")
-    @Mapping(target = "role.id", source = "user.role")
-    @Mapping(target = "enable", source = "dto.enable")
+    @Mapping(target = "avatar", source = "user.avatar")
+    @Mapping(target = "role", source = "user.role")
+    @Mapping(target = "enable", source = "user.enable")
     UserResponseDTO userToUserResponseDTO(User user);
 }
