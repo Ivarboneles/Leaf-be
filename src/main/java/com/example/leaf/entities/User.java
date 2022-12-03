@@ -52,7 +52,7 @@ public class User implements UserDetails {
     private String phone;
 
     @CreationTimestamp
-    private Date birthDay;
+    private Date birthday;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "address", referencedColumnName = "id")
@@ -65,7 +65,7 @@ public class User implements UserDetails {
     private Gender gender;
 
     private String avatar;
-    private String nickName;
+    private String nickname;
     private String bio;
 
     @ManyToOne(optional = true)

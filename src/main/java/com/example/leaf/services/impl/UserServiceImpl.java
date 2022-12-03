@@ -1,5 +1,6 @@
 package com.example.leaf.services.impl;
 
+import com.example.leaf.dto.request.ChangePasswordRequestDTO;
 import com.example.leaf.dto.request.UserRequestDTO;
 import com.example.leaf.dto.response.ResponseObject;
 import com.example.leaf.dto.response.UserResponseDTO;
@@ -137,6 +138,31 @@ public class UserServiceImpl implements UserService {
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(HttpStatus.OK, "Update user successfully!",
                 userResponseDTO));
 
+    }
+
+    @Override
+    public ResponseEntity<ResponseObject> changePassword(Long id, ChangePasswordRequestDTO changePasswordRequestDTO) {
+        User userExists = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Could not find user with ID = " + id));
+        String oldPassword = changePasswordRequestDTO.getOldPassword();
+        String newPassword = changePasswordRequestDTO.getNewPassword();
+        String verification = changePasswordRequestDTO.getVerificationCode();
+
+        if(userExists.getVerificationCode().equals(verification)) {
+            if(userExists.getPassword().equals(oldPassword)){
+                userExists.setPassword(newPassword);
+                encodePassword(userExists);
+            }else {
+                throw new ResourceNotFoundException("Old password no match");
+            }
+
+        }else {
+            throw new ResourceNotFoundException("Verify failed!");
+        }
+        UserResponseDTO userResponseDTO = mapper.userToUserResponseDTO(userRepository.save(userExists));
+
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(HttpStatus.OK, "Update user successfully!",
+                userResponseDTO));
     }
 
     @Override

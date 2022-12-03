@@ -1,5 +1,6 @@
 package com.example.leaf.dto.response;
 
+import com.example.leaf.entities.Address;
 import com.example.leaf.entities.Role;
 import com.example.leaf.entities.enums.Gender;
 import lombok.AllArgsConstructor;
@@ -17,13 +18,13 @@ public class UserResponseDTO {
     private String username;
     private String phone;
     private String email;
-    private String address;
+    private Address address;
     private String birthday;
     private Gender gender;
     private String nickname;
     private String bio;
     private Boolean enable;
-    private String image;
+    private String avatar;
     private Role role;
 
 }
