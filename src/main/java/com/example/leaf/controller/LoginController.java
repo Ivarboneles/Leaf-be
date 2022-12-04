@@ -45,7 +45,7 @@ public class LoginController {
                     content = { @Content(mediaType = "application/json") })
     })
     @PostMapping(value = "/login")
-    public ResponseEntity<ResponseObject> login(@RequestBody LoginRequestDTO body) throws LoginException {
+    public ResponseEntity<?> login(@RequestBody LoginRequestDTO body) throws LoginException {
         return ResponseEntity.ok(login(body, RoleEnum.CUSTOMER));
     }
 

@@ -80,10 +80,6 @@ public class User implements UserDetails {
         authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getName()));
         return authorities;
     }
-    @Override
-    public String getUsername() {
-        return null;
-    }
 
     @Override
     public boolean isAccountNonExpired() {

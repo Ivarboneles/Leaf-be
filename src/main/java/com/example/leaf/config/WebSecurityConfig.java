@@ -49,6 +49,7 @@ public class WebSecurityConfig {
                 else
                     return userRepository.findUserByPhone(username)
                             .orElseThrow(() -> new ResourceNotFoundException("User " + username + " not found"));
+
             }
         };
     }

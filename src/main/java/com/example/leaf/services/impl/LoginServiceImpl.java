@@ -42,7 +42,8 @@ public class LoginServiceImpl implements LoginService {
 
         @SuppressWarnings("rawtypes")
         User user = (User) auth.getPrincipal();
-        String token = generateToken(username);
+        System.out.println(user.getUsername());
+        String token = generateToken(user.getUsername());
 
         String r = user.getRole().getName();
 

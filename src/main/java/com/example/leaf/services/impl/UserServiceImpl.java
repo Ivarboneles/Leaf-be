@@ -2,22 +2,22 @@ package com.example.leaf.services.impl;
 
 import com.example.leaf.dto.request.ChangePasswordRequestDTO;
 import com.example.leaf.dto.request.UserRequestDTO;
-import com.example.leaf.dto.response.ResponseObject;
+import com.example.leaf.dto.response.DataResponse;
 import com.example.leaf.dto.response.UserResponseDTO;
 import com.example.leaf.entities.Role;
 import com.example.leaf.entities.User;
+import com.example.leaf.entities.enums.RoleEnum;
 import com.example.leaf.exceptions.ResourceAlreadyExistsException;
 import com.example.leaf.exceptions.ResourceNotFoundException;
 
 import com.example.leaf.repositories.RoleRepository;
 import com.example.leaf.repositories.UserRepository;
 import com.example.leaf.services.UserService;
+import com.example.leaf.utils.ServiceUtils;
 import net.bytebuddy.utility.RandomString;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -34,6 +34,8 @@ import java.util.Optional;
 @Transactional
 public class UserServiceImpl implements UserService {
 
+    @Autowired
+    ServiceUtils serviceUtils;
 
     @Autowired
     ModelMapper mapper;
@@ -54,7 +56,7 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public ResponseEntity<ResponseObject> saveUser(UserRequestDTO userRequestDTO, String siteUrl)
+    public DataResponse<?> saveUser(UserRequestDTO userRequestDTO, String siteUrl)
             throws MessagingException, UnsupportedEncodingException {
         User user =  mapper.map(userRequestDTO, User.class);
 
@@ -72,22 +74,17 @@ public class UserServiceImpl implements UserService {
 
         encodePassword(user);
         // Check role already exists
-        Role role = roleRepository.findRoleByName(user.getRole().getName())
-                .orElseThrow(() -> new ResourceNotFoundException("Could not find role with ID = " + user.getRole().getName()));
-        user.setRole(role);
-        user.setEnable(false);
+        user.setRole(roleRepository.findRoleByName(RoleEnum.CUSTOMER.toString()).get());
+        user.setEnable(true);
 
         String randomCodeVerify = RandomString.make(64);
         user.setVerificationCode(randomCodeVerify);
-
-        UserResponseDTO userResponseDTO = mapper.map(userRepository.save(user), UserResponseDTO.class);
         sendVerificationEmail(user, siteUrl);
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new ResponseObject(HttpStatus.OK, "Create user successfully!", userResponseDTO));
+        return serviceUtils.convertToDataResponse(userRepository.save(user), UserResponseDTO.class);
     }
 
     @Override
-    public ResponseEntity<ResponseObject> updateUser(String username, UserRequestDTO userRequestDTO) {
+    public DataResponse<?> updateUser(String username, UserRequestDTO userRequestDTO) {
         User user = mapper.map(userRequestDTO, User.class);
         User userExists = userRepository.findById(username)
                 .orElseThrow(() -> new ResourceNotFoundException("Could not find user with ID = " + username));
@@ -126,15 +123,11 @@ public class UserServiceImpl implements UserService {
         Role role = roleRepository.findRoleByName(user.getRole().getName())
                 .orElseThrow(() -> new ResourceNotFoundException("Could not find role with ID = " + user.getRole().getName()));
         user.setRole(role);
-        UserResponseDTO userResponseDTO = mapper.map(userRepository.save(user), UserResponseDTO.class);
-
-        return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(HttpStatus.OK, "Update user successfully!",
-                userResponseDTO));
-
+        return serviceUtils.convertToDataResponse(userRepository.save(user), UserResponseDTO.class);
     }
 
     @Override
-    public ResponseEntity<ResponseObject> changePassword(String username, ChangePasswordRequestDTO changePasswordRequestDTO) {
+    public DataResponse<?> changePassword(String username, ChangePasswordRequestDTO changePasswordRequestDTO) {
         User userExists = userRepository.findById(username)
                 .orElseThrow(() -> new ResourceNotFoundException("Could not find user with ID = " + username));
         String oldPassword = changePasswordRequestDTO.getOldPassword();
@@ -152,27 +145,25 @@ public class UserServiceImpl implements UserService {
         }else {
             throw new ResourceNotFoundException("Verify failed!");
         }
-        UserResponseDTO userResponseDTO = mapper.map(userRepository.save(userExists), UserResponseDTO.class);
 
-        return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(HttpStatus.OK, "Update user successfully!",
-                userResponseDTO));
+        return serviceUtils.convertToDataResponse(userRepository.save(userExists), UserResponseDTO.class);
     }
 
     @Override
-    public ResponseEntity<UserResponseDTO> getUserById(String username) {
+    public DataResponse<?> getUserById(String username) {
         User user = userRepository.findById(username)
                 .orElseThrow(() -> new ResourceNotFoundException("Could not find user with ID = " + username));
-        UserResponseDTO userResponseDTO = mapper.map(user, UserResponseDTO.class);
-        return ResponseEntity.status(HttpStatus.OK).body(userResponseDTO);
+
+        return serviceUtils.convertToDataResponse(user, UserResponseDTO.class);
     }
 
     @Override
-    public ResponseEntity<ResponseObject> verifyUser(String verifyCode) {
+    public DataResponse<?> verifyUser(String verifyCode) {
         User getUser = userRepository.findUserByVerificationCode(verifyCode)
                 .orElseThrow(() -> new ResourceNotFoundException("Verify code is incorrect"));
         getUser.setEnable(true);
-        User user = userRepository.save(getUser);
-        return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(HttpStatus.OK, "Verify account success!!!"));
+
+        return serviceUtils.convertToDataResponse(userRepository.save(getUser), UserResponseDTO.class);
     }
 
     private void encodePassword(User user) {
@@ -188,7 +179,7 @@ public class UserServiceImpl implements UserService {
         String mailContent = "<p>Dear " + user.getName() + ",<p><br>"
                 + "Please click the link below to verify your registration:<br>"
                 + "<h3><a href = \"" + verifyUrl + "\">VERIFY</a></h3>"
-                + "Thank you,<br>" + "Mobile University.";
+                + "Thank you,<br>" + "Leaf App";
 
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper messageHelper = new MimeMessageHelper(message);

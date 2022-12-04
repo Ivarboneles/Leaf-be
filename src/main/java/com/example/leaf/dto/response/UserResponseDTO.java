@@ -8,13 +8,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.validation.constraints.NotNull;
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserResponseDTO {
-    private String name;
+
     private String username;
+    private String name;
     private String phone;
     private String email;
     private Address address;

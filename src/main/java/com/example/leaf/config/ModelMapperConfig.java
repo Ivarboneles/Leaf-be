@@ -1,5 +1,7 @@
 package com.example.leaf.config;
 
+import com.example.leaf.dto.response.UserResponseDTO;
+import com.example.leaf.entities.User;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
@@ -16,6 +18,7 @@ public class ModelMapperConfig {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration()
                 .setMatchingStrategy(MatchingStrategies.STRICT);
+
 
         return modelMapper;
     }
