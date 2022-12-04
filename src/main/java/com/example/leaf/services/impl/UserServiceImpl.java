@@ -8,13 +8,13 @@ import com.example.leaf.entities.Role;
 import com.example.leaf.entities.User;
 import com.example.leaf.exceptions.ResourceAlreadyExistsException;
 import com.example.leaf.exceptions.ResourceNotFoundException;
-import com.example.leaf.mapper.UserMapper;
+
 import com.example.leaf.repositories.RoleRepository;
 import com.example.leaf.repositories.UserRepository;
-import com.example.leaf.services.ImageStorageService;
 import com.example.leaf.services.UserService;
 import net.bytebuddy.utility.RandomString;
-import org.mapstruct.factory.Mappers;
+
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +34,9 @@ import java.util.Optional;
 @Transactional
 public class UserServiceImpl implements UserService {
 
-    private final UserMapper mapper = Mappers.getMapper(UserMapper.class);
+
+    @Autowired
+    ModelMapper mapper;
 
     @Autowired
     private UserRepository userRepository;
@@ -46,8 +48,6 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private ImageStorageService imageStorageService;
 
     @Autowired
     private JavaMailSender mailSender;
@@ -56,7 +56,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public ResponseEntity<ResponseObject> saveUser(UserRequestDTO userRequestDTO, String siteUrl)
             throws MessagingException, UnsupportedEncodingException {
-        User user = mapper.userRequestDTOtoUser(userRequestDTO);
+        User user =  mapper.map(userRequestDTO, User.class);
 
         // Check phone user existed
         Optional<User> userCheckPhone = userRepository.findUserByPhone(userRequestDTO.getPhone());
@@ -72,26 +72,25 @@ public class UserServiceImpl implements UserService {
 
         encodePassword(user);
         // Check role already exists
-        Role role = roleRepository.findRoleById(user.getRole().getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Could not find role with ID = " + user.getRole().getId()));
+        Role role = roleRepository.findRoleByName(user.getRole().getName())
+                .orElseThrow(() -> new ResourceNotFoundException("Could not find role with ID = " + user.getRole().getName()));
         user.setRole(role);
         user.setEnable(false);
 
         String randomCodeVerify = RandomString.make(64);
         user.setVerificationCode(randomCodeVerify);
 
-        UserResponseDTO userResponseDTO = mapper.userToUserResponseDTO(userRepository.save(user));
+        UserResponseDTO userResponseDTO = mapper.map(userRepository.save(user), UserResponseDTO.class);
         sendVerificationEmail(user, siteUrl);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ResponseObject(HttpStatus.OK, "Create user successfully!", userResponseDTO));
     }
 
     @Override
-    public ResponseEntity<ResponseObject> updateUser(Long id, UserRequestDTO userRequestDTO) {
-        User user = mapper.userRequestDTOtoUser(userRequestDTO);
-        user.setId(id);
-        User userExists = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Could not find user with ID = " + id));
+    public ResponseEntity<ResponseObject> updateUser(String username, UserRequestDTO userRequestDTO) {
+        User user = mapper.map(userRequestDTO, User.class);
+        User userExists = userRepository.findById(username)
+                .orElseThrow(() -> new ResourceNotFoundException("Could not find user with ID = " + username));
 
         // Check email user existed
         if (!user.getEmail().equals(userExists.getEmail())) {
@@ -109,12 +108,6 @@ public class UserServiceImpl implements UserService {
             }
         }
 
-        //Store image
-        if (userRequestDTO.getAvatar() != null){
-            user.setAvatar(
-                    imageStorageService.storeFile(userRequestDTO.getAvatar(), "user"));
-        }
-
         //Update password
         if (userRequestDTO.getPassword() == null){
             user.setPassword(userExists.getPassword());
@@ -126,14 +119,14 @@ public class UserServiceImpl implements UserService {
         if (userRequestDTO.getEnable() == null){
             user.setEnable(userExists.isEnabled());
         } else {
-            user.setEnable(Boolean.parseBoolean(userRequestDTO.getEnable()));
+            user.setEnable(userRequestDTO.getEnable());
         }
 
         // Check role already exists
-        Role role = roleRepository.findRoleById(user.getRole().getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Could not find role with ID = " + user.getRole().getId()));
+        Role role = roleRepository.findRoleByName(user.getRole().getName())
+                .orElseThrow(() -> new ResourceNotFoundException("Could not find role with ID = " + user.getRole().getName()));
         user.setRole(role);
-        UserResponseDTO userResponseDTO = mapper.userToUserResponseDTO(userRepository.save(user));
+        UserResponseDTO userResponseDTO = mapper.map(userRepository.save(user), UserResponseDTO.class);
 
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(HttpStatus.OK, "Update user successfully!",
                 userResponseDTO));
@@ -141,9 +134,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseEntity<ResponseObject> changePassword(Long id, ChangePasswordRequestDTO changePasswordRequestDTO) {
-        User userExists = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Could not find user with ID = " + id));
+    public ResponseEntity<ResponseObject> changePassword(String username, ChangePasswordRequestDTO changePasswordRequestDTO) {
+        User userExists = userRepository.findById(username)
+                .orElseThrow(() -> new ResourceNotFoundException("Could not find user with ID = " + username));
         String oldPassword = changePasswordRequestDTO.getOldPassword();
         String newPassword = changePasswordRequestDTO.getNewPassword();
         String verification = changePasswordRequestDTO.getVerificationCode();
@@ -159,17 +152,17 @@ public class UserServiceImpl implements UserService {
         }else {
             throw new ResourceNotFoundException("Verify failed!");
         }
-        UserResponseDTO userResponseDTO = mapper.userToUserResponseDTO(userRepository.save(userExists));
+        UserResponseDTO userResponseDTO = mapper.map(userRepository.save(userExists), UserResponseDTO.class);
 
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject(HttpStatus.OK, "Update user successfully!",
                 userResponseDTO));
     }
 
     @Override
-    public ResponseEntity<UserResponseDTO> getUserById(Long id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Could not find user with ID = " + id));
-        UserResponseDTO userResponseDTO = mapper.userToUserResponseDTO(user);
+    public ResponseEntity<UserResponseDTO> getUserById(String username) {
+        User user = userRepository.findById(username)
+                .orElseThrow(() -> new ResourceNotFoundException("Could not find user with ID = " + username));
+        UserResponseDTO userResponseDTO = mapper.map(user, UserResponseDTO.class);
         return ResponseEntity.status(HttpStatus.OK).body(userResponseDTO);
     }
 
@@ -206,6 +199,5 @@ public class UserServiceImpl implements UserService {
         messageHelper.setText(mailContent, true);
         mailSender.send(message);
     }
-
 
 }

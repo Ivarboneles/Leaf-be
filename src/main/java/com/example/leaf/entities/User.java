@@ -1,9 +1,8 @@
 package com.example.leaf.entities;
 
-import com.example.leaf.entities.enums.Gender;
+import com.example.leaf.entities.enums.GenderEnum;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,12 +24,9 @@ import java.util.List;
 @Entity
 @Table(name = "user")
 public class User implements UserDetails {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
-    @Column(name = "username", length = 45)
-    @NotNull(message = "Name is required")
+    @Id
+    @Column(length = 45)
     private String username;
 
     @Column(name = "name", length = 45)
@@ -62,7 +58,7 @@ public class User implements UserDetails {
     private Date createDate;
 
     @NotNull(message = "Enable is required")
-    private Gender gender;
+    private GenderEnum genderEnum;
 
     private String avatar;
     private String nickname;

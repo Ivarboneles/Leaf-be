@@ -36,9 +36,6 @@ public class LoginController {
     @Autowired
     JwtTokenUtil jwtUtil;
 
-
-    public static final String URL = "http://localhost:3000";
-
     @Operation(
             summary = "Login API for customer",
             description = "Login key can be username, phone number or email that user is registered.")

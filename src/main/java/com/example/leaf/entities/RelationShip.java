@@ -1,6 +1,6 @@
 package com.example.leaf.entities;
 
-import com.example.leaf.entities.enums.Status;
+import com.example.leaf.entities.enums.StatusEnum;
 import com.example.leaf.entities.keys.RelationShipKey;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -35,6 +35,6 @@ public class RelationShip {
     private Date createDate;
 
     @NotNull(message = "Status is required")
-    private Status status;
+    private StatusEnum statusEnum;
 
 }

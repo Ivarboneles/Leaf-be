@@ -17,11 +17,7 @@ import javax.validation.constraints.NotNull;
 @Table(name = "role")
 public class Role {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
     @Column(length = 45, unique = true)
-    @NotNull(message = "Role name is required")
-    private RoleEnum name;
+    private String name;
 }
 

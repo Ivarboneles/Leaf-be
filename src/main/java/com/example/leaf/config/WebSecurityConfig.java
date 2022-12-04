@@ -3,7 +3,7 @@ package com.example.leaf.config;
 import com.example.leaf.exceptions.ResourceNotFoundException;
 import com.example.leaf.utils.MapHelper;
 import com.example.leaf.dto.response.ResponseObject;
-import com.example.leaf.filter.JwtTokenFilter;
+import com.example.leaf.utils.JwtTokenFilter;
 import com.example.leaf.repositories.UserRepository;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,7 +27,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.webjars.NotFoundException;
 
 @Configuration
 @EnableWebSecurity

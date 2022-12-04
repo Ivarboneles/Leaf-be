@@ -1,4 +1,4 @@
-package com.example.leaf.controller;
+package com.example.leaf.controller.customer;
 
 import com.example.leaf.dto.request.ChangePasswordRequestDTO;
 import com.example.leaf.dto.request.UserRequestDTO;
@@ -22,9 +22,9 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @GetMapping(value = "/{id}")
-    public ResponseEntity<UserResponseDTO> getUserById (@PathVariable(name = "id") Long id) {
-        return userService.getUserById(id);
+    @GetMapping(value = "/{username}")
+    public ResponseEntity<UserResponseDTO> getUserById (@PathVariable(name = "username") String username) {
+        return userService.getUserById(username);
     }
 
     @PostMapping(value = "/create")
@@ -35,14 +35,14 @@ public class UserController {
         return userService.saveUser(userRequestDTO, siteUrl);
     }
 
-    @PutMapping(value = "/update-profile/{id}")
-    public ResponseEntity<ResponseObject> updateProfile(@PathVariable(name = "id") Long id,@RequestBody UserRequestDTO userRequestDTO){
-        return  userService.updateUser(id, userRequestDTO);
+    @PutMapping(value = "/update-profile/{username}")
+    public ResponseEntity<ResponseObject> updateProfile(@PathVariable(name = "username") String username,@RequestBody UserRequestDTO userRequestDTO){
+        return  userService.updateUser(username, userRequestDTO);
     }
 
-    @PutMapping(value = "/change-password/{id}")
-    public ResponseEntity<ResponseObject> changePassword(@PathVariable(name = "id") Long id,@RequestBody ChangePasswordRequestDTO changePasswordRequestDTO){
-        return  userService.changePassword(id, changePasswordRequestDTO);
+    @PutMapping(value = "/change-password/{username}")
+    public ResponseEntity<ResponseObject> changePassword(@PathVariable(name = "username") String username,@RequestBody ChangePasswordRequestDTO changePasswordRequestDTO){
+        return  userService.changePassword(username, changePasswordRequestDTO);
     }
 
     @PostMapping(value = "/send-verify")

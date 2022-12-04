@@ -1,6 +1,8 @@
 package com.example.leaf.entities.keys;
 
 import java.io.Serializable;
+import java.util.UUID;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,8 +15,8 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ReactionPostKey implements Serializable{
 
-    private Long post;
-    private Long reaction;
+    private UUID post;
+    private UUID reaction;
 
     @Override
     public int hashCode() {

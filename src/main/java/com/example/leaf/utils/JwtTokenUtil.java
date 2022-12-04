@@ -55,7 +55,7 @@ public class JwtTokenUtil {
     }
 
     public String generateToken(User user){
-        return Jwts.builder().setSubject(String.format("%s,%s", user.getId(), user.getPhone()))
+        return Jwts.builder().setSubject(String.format("%s,%s", user.getUsername(), user.getPhone()))
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRE_DURATION))
                 .signWith(SignatureAlgorithm.HS512, SECRET_KEY).compact();

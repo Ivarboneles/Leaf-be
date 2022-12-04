@@ -1,14 +1,16 @@
 package com.example.leaf.entities;
 
-import com.example.leaf.entities.enums.Status;
+import com.example.leaf.entities.enums.StatusEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -19,11 +21,16 @@ import java.util.Date;
 public class Post {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(
+            name = "UUID",
+            strategy = "org.hibernate.id.UUIDGenerator"
+    )
+    @Column(length = 16)
+    private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user", referencedColumnName = "id")
+    @JoinColumn(name = "user", referencedColumnName = "username")
     private User user;
 
     @OneToOne(fetch = FetchType.LAZY)
@@ -37,5 +44,5 @@ public class Post {
     private String value;
 
     @NotNull(message = "Status is required")
-    private Status status;
+    private StatusEnum statusEnum;
 }

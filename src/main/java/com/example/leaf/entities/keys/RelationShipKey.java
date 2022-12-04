@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -14,8 +15,8 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class RelationShipKey implements Serializable {
 
-    private Long userFrom;
-    private Long userTo;
+    private String userFrom;
+    private String userTo;
 
     @Override
     public int hashCode() {

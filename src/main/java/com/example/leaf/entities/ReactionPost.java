@@ -2,7 +2,7 @@ package com.example.leaf.entities;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
-import com.example.leaf.entities.enums.Status;
+import com.example.leaf.entities.enums.StatusEnum;
 import com.example.leaf.entities.keys.ReactionPostKey;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -31,7 +31,7 @@ public class ReactionPost {
     private Post post;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user", referencedColumnName = "id")
+    @JoinColumn(name = "user", referencedColumnName = "username")
     private User user;
 
     @NotNull(message = "Create date is required")
@@ -40,5 +40,5 @@ public class ReactionPost {
 
 
     @NotNull(message = "Status is required")
-    private Status status;
+    private StatusEnum statusEnum;
 }

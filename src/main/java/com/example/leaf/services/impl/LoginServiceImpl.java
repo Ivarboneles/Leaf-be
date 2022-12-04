@@ -1,19 +1,22 @@
 package com.example.leaf.services.impl;
 
 import com.example.leaf.dto.response.LoginResponseDTO;
+import com.example.leaf.dto.response.UserResponseDTO;
 import com.example.leaf.entities.User;
 import com.example.leaf.entities.enums.RoleEnum;
-import com.example.leaf.mapper.UserMapper;
+
 import com.example.leaf.repositories.UserRepository;
 import com.example.leaf.services.LoginService;
 import com.example.leaf.utils.JwtTokenUtil;
-import org.mapstruct.factory.Mappers;
+
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
 
 import javax.security.auth.login.LoginException;
 import javax.swing.text.html.Option;
@@ -23,7 +26,8 @@ import java.util.Optional;
 @Service
 @Transactional
 public class LoginServiceImpl implements LoginService {
-    private final UserMapper mapper = Mappers.getMapper(UserMapper.class);
+    @Autowired
+    ModelMapper mapper;
     @Autowired
     AuthenticationManager authenticationManager;
     @Autowired
@@ -40,18 +44,18 @@ public class LoginServiceImpl implements LoginService {
         User user = (User) auth.getPrincipal();
         String token = generateToken(username);
 
-        RoleEnum r =user.getRole().getName();
+        String r = user.getRole().getName();
 
-        if (requestedRole.equals(RoleEnum.CUSTOMER) && requestedRole.equals(r)) { // buyer
+        if (requestedRole.equals(RoleEnum.CUSTOMER) && requestedRole.toString().equals(r)) { // buyer
             return new LoginResponseDTO<>(
                     token,
-                    mapper.userToUserResponseDTO(user)
+                    mapper.map(user, UserResponseDTO.class)
             );
         }
-        else if (requestedRole.equals(RoleEnum.ADMIN) && !r.equals(RoleEnum.CUSTOMER)) {
+        else if (requestedRole.equals(RoleEnum.ADMIN) && !r.equals(RoleEnum.CUSTOMER.toString())) {
             return new LoginResponseDTO<>(
                     token,
-                    mapper.userToUserResponseDTO(user)
+                    mapper.map(user, UserResponseDTO.class)
             );
         }
         else {

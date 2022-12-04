@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 
 @Getter
@@ -13,8 +14,8 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class ReactionCommentKey implements Serializable {
 
-    private Long comment;
-    private Long reaction;
+    private UUID comment;
+    private UUID reaction;
 
     @Override
     public int hashCode() {

@@ -20,9 +20,9 @@ import java.util.Optional;
 public interface UserService {
     ResponseEntity<ResponseObject> saveUser(UserRequestDTO userRequestDTO, String siteUrl)
             throws MessagingException, UnsupportedEncodingException;
-    ResponseEntity<ResponseObject> updateUser(Long id, UserRequestDTO userRequestDTO);
-    ResponseEntity<ResponseObject> changePassword(Long id, ChangePasswordRequestDTO changePasswordRequestDTO);
-    ResponseEntity<UserResponseDTO> getUserById(Long id);
+    ResponseEntity<ResponseObject> updateUser(String username, UserRequestDTO userRequestDTO);
+    ResponseEntity<ResponseObject> changePassword(String username, ChangePasswordRequestDTO changePasswordRequestDTO);
+    ResponseEntity<UserResponseDTO> getUserById(String username);
     ResponseEntity<ResponseObject> verifyUser(String verifyCode);
 }
 

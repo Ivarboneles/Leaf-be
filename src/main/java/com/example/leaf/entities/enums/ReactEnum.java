@@ -1,5 +1,5 @@
 package com.example.leaf.entities.enums;
 
-public enum React {
+public enum ReactEnum {
     LIKE, LOVE, HAHA, WOW, SAD, ANGRY
 }

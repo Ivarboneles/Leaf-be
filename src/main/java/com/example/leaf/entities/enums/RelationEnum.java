@@ -1,5 +1,5 @@
 package com.example.leaf.entities.enums;
 
-public enum Relation {
+public enum RelationEnum {
     WAITING, FOLLOW, UNFOLLOW, BLOCK,
 }
