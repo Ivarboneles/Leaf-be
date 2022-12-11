@@ -80,9 +80,8 @@ public class WebSecurityConfig {
 
         http
                 .authorizeRequests()
-                .antMatchers("/api/login",
-                        "/api/login/customer", "/api/register",
-                        "/api/reset-password").permitAll()
+                .antMatchers("/api/v1/login/**",
+                         "/api/v1/forgot-password", "/api/v1/user/create").permitAll()
                 .and()
                 .authorizeRequests()
                 .antMatchers("/api/v1/admin/**").hasRole("ADMIN")
@@ -93,14 +92,6 @@ public class WebSecurityConfig {
                 .authorizeRequests()
                 .antMatchers("/**").permitAll();
 
-        http.authorizeRequests()
-                .antMatchers("/auth/login", "/docs/**", "/swagger-ui/index.html#/**", "/verify", "/api/v1/image/**")
-                .permitAll()
-                .anyRequest()
-                .permitAll()
-                .and().logout().logoutSuccessUrl("/auth/login")
-                .invalidateHttpSession(true)
-                .deleteCookies("JSESSIONID");
 
         // Handle exception config
         http.exceptionHandling()

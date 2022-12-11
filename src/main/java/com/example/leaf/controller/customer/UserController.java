@@ -9,7 +9,9 @@ import com.example.leaf.entities.User;
 import com.example.leaf.exceptions.InvalidValueException;
 import com.example.leaf.services.ImageService;
 import com.example.leaf.services.UserService;
+import com.example.leaf.utils.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +28,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    JwtTokenUtil jwtTokenUtil;
 
 
     @GetMapping(value = "/{username}")
@@ -48,12 +53,12 @@ public class UserController {
         return  ResponseEntity.ok(userService.changePassword(username, changePasswordRequestDTO));
     }
 
-    @PostMapping(value = "/change-avatar")
+    @PostMapping(value = "/change-avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> changeAvatar(
-            @AuthenticationPrincipal User user,
-            @RequestPart(name = "avatar") MultipartFile avatar){
+            @RequestPart(name = "avatar") MultipartFile avatar,
+            HttpServletRequest request){
 
-        return ResponseEntity.ok(userService.changeAvatar(user, avatar));
+        return ResponseEntity.ok(userService.changeAvatar(jwtTokenUtil.getUserDetails(JwtTokenUtil.getAccessToken(request)), avatar));
     }
 
     @PostMapping(value = "/send-verify")

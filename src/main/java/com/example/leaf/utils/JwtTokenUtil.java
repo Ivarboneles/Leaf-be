@@ -61,7 +61,7 @@ public class JwtTokenUtil {
                 .signWith(SignatureAlgorithm.HS512, SECRET_KEY).compact();
     }
 
-    public UserDetails getUserDetails(String token){
+    public User getUserDetails(String token){
         User userDetails = new User();
         String[] jwtSubject = getSubject(token).split(",");
         userDetails = (User) userDetailsService.loadUserByUsername(jwtSubject[1]);
