@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.UUID;
 
-public interface NotifyRepository extends JpaRepository<Notify, UUID> {
+public interface NotifyRepository extends JpaRepository<Notify, String> {
 }

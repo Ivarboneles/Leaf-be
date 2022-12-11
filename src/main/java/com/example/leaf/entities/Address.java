@@ -21,13 +21,7 @@ import java.util.UUID;
 @Table(name = "address")
 public class Address {
     @Id
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(
-            name = "UUID",
-            strategy = "org.hibernate.id.UUIDGenerator"
-    )
-    @Column(length = 16)
-    private UUID id;
+    private String id;
 
     @NotNull(message = "Address city is required")
     private String country;

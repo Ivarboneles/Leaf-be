@@ -5,10 +5,15 @@ import com.example.leaf.dto.request.UserRequestDTO;
 import com.example.leaf.dto.request.VerifyRequestDTO;
 import com.example.leaf.dto.response.ResponseObject;
 import com.example.leaf.dto.response.UserResponseDTO;
+import com.example.leaf.entities.User;
+import com.example.leaf.exceptions.InvalidValueException;
+import com.example.leaf.services.ImageService;
 import com.example.leaf.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
@@ -22,17 +27,15 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+
     @GetMapping(value = "/{username}")
     public ResponseEntity<?> getUserById (@PathVariable(name = "username") String username) {
         return ResponseEntity.ok( userService.getUserById(username));
     }
 
     @PostMapping(value = "/create")
-    public ResponseEntity<?> createUser(@RequestBody UserRequestDTO userRequestDTO,
-                                                     HttpServletRequest request)
-            throws MessagingException, UnsupportedEncodingException {
-        String siteUrl = request.getRequestURL().toString().replace(request.getServletPath(), "");
-        return ResponseEntity.ok(userService.saveUser(userRequestDTO, siteUrl));
+    public ResponseEntity<?> createUser(@RequestBody UserRequestDTO userRequestDTO) {
+        return ResponseEntity.ok(userService.saveUser(userRequestDTO));
     }
 
     @PutMapping(value = "/update-profile/{username}")
@@ -43,6 +46,14 @@ public class UserController {
     @PutMapping(value = "/change-password/{username}")
     public ResponseEntity<?> changePassword(@PathVariable(name = "username") String username,@RequestBody ChangePasswordRequestDTO changePasswordRequestDTO){
         return  ResponseEntity.ok(userService.changePassword(username, changePasswordRequestDTO));
+    }
+
+    @PostMapping(value = "/change-avatar")
+    public ResponseEntity<?> changeAvatar(
+            @AuthenticationPrincipal User user,
+            @RequestPart(name = "avatar") MultipartFile avatar){
+
+        return ResponseEntity.ok(userService.changeAvatar(user, avatar));
     }
 
     @PostMapping(value = "/send-verify")

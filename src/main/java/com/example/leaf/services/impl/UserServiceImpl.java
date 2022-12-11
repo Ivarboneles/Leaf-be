@@ -7,11 +7,13 @@ import com.example.leaf.dto.response.UserResponseDTO;
 import com.example.leaf.entities.Role;
 import com.example.leaf.entities.User;
 import com.example.leaf.entities.enums.RoleEnum;
+import com.example.leaf.exceptions.InvalidValueException;
 import com.example.leaf.exceptions.ResourceAlreadyExistsException;
 import com.example.leaf.exceptions.ResourceNotFoundException;
 
 import com.example.leaf.repositories.RoleRepository;
 import com.example.leaf.repositories.UserRepository;
+import com.example.leaf.services.ImageService;
 import com.example.leaf.services.UserService;
 import com.example.leaf.utils.ServiceUtils;
 import net.bytebuddy.utility.RandomString;
@@ -22,6 +24,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -34,6 +37,8 @@ import java.util.Optional;
 @Transactional
 public class UserServiceImpl implements UserService {
 
+    @Autowired
+    ImageService imageService;
     @Autowired
     ServiceUtils serviceUtils;
 
@@ -56,9 +61,14 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public DataResponse<?> saveUser(UserRequestDTO userRequestDTO, String siteUrl)
-            throws MessagingException, UnsupportedEncodingException {
+    public DataResponse<?> saveUser(UserRequestDTO userRequestDTO) {
         User user =  mapper.map(userRequestDTO, User.class);
+
+        // Check phone user existed
+        Optional<User> userCheckUsername = userRepository.findUserByUsername(userRequestDTO.getUsername());
+        if (userCheckUsername.isPresent()) {
+            throw new ResourceAlreadyExistsException("Username user existed");
+        }
 
         // Check phone user existed
         Optional<User> userCheckPhone = userRepository.findUserByPhone(userRequestDTO.getPhone());
@@ -79,7 +89,6 @@ public class UserServiceImpl implements UserService {
 
         String randomCodeVerify = RandomString.make(64);
         user.setVerificationCode(randomCodeVerify);
-        sendVerificationEmail(user, siteUrl);
         return serviceUtils.convertToDataResponse(userRepository.save(user), UserResponseDTO.class);
     }
 
@@ -112,12 +121,6 @@ public class UserServiceImpl implements UserService {
             encodePassword(user);
         }
 
-        //Update enable
-        if (userRequestDTO.getEnable() == null){
-            user.setEnable(userExists.isEnabled());
-        } else {
-            user.setEnable(userRequestDTO.getEnable());
-        }
 
         // Check role already exists
         Role role = roleRepository.findRoleByName(user.getRole().getName())
@@ -166,6 +169,21 @@ public class UserServiceImpl implements UserService {
         return serviceUtils.convertToDataResponse(userRepository.save(getUser), UserResponseDTO.class);
     }
 
+    @Override
+    public DataResponse<?> changeAvatar(User user, MultipartFile avatar) {
+        try{
+            String fileName = imageService.save(avatar);
+
+            String imageUrl = imageService.getImageUrl(fileName);
+
+            user.setAvatar(imageUrl);
+
+            return serviceUtils.convertToDataResponse(userRepository.save(user), UserResponseDTO.class);
+
+        }catch (Exception e){
+            throw new InvalidValueException("Can't upload file");
+        }
+    }
     private void encodePassword(User user) {
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
@@ -174,7 +192,7 @@ public class UserServiceImpl implements UserService {
     private void sendVerificationEmail(User user, String siteUrl)
             throws MessagingException, UnsupportedEncodingException {
         String subject = "Please verify your registration";
-        String senderName = "Mobile University Store";
+        String senderName = "Leaf App";
         String verifyUrl = siteUrl + "/verify?code=" + user.getVerificationCode();
         String mailContent = "<p>Dear " + user.getName() + ",<p><br>"
                 + "Please click the link below to verify your registration:<br>"
@@ -184,7 +202,7 @@ public class UserServiceImpl implements UserService {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper messageHelper = new MimeMessageHelper(message);
 
-        messageHelper.setFrom("mobileuniversity@gmail.com", senderName);
+        messageHelper.setFrom("leafapp@gmail.com", senderName);
         messageHelper.setTo(user.getEmail());
         messageHelper.setSubject(subject);
         messageHelper.setText(mailContent, true);

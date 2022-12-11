@@ -1,17 +1,21 @@
 package com.example.leaf.config;
 
+import com.example.leaf.entities.User;
 import com.example.leaf.exceptions.ResourceNotFoundException;
+import com.example.leaf.utils.JWTAuthorizationFilter;
 import com.example.leaf.utils.MapHelper;
 import com.example.leaf.dto.response.ResponseObject;
 import com.example.leaf.utils.JwtTokenFilter;
 import com.example.leaf.repositories.UserRepository;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -43,6 +47,10 @@ public class WebSecurityConfig {
         return new UserDetailsService() {
             @Override
             public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+                Optional<User> userOp = userRepository.findUserByUsername(username);
+                if(userOp.isPresent()){
+                    return userOp.get();
+                }
                 if (username.contains("@"))
                     return userRepository.findUserByEmail(username)
                             .orElseThrow(() -> new ResourceNotFoundException("User " + username + " not found"));
@@ -69,6 +77,21 @@ public class WebSecurityConfig {
     SecurityFilterChain configure(HttpSecurity http) throws Exception {
         http.csrf().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+
+        http
+                .authorizeRequests()
+                .antMatchers("/api/login",
+                        "/api/login/customer", "/api/register",
+                        "/api/reset-password").permitAll()
+                .and()
+                .authorizeRequests()
+                .antMatchers("/api/v1/admin/**").hasRole("ADMIN")
+                .and()
+                .authorizeRequests()
+                .antMatchers("/api/v1/user/**").hasRole("CUSTOMER")
+                .and()
+                .authorizeRequests()
+                .antMatchers("/**").permitAll();
 
         http.authorizeRequests()
                 .antMatchers("/auth/login", "/docs/**", "/swagger-ui/index.html#/**", "/verify", "/api/v1/image/**")

@@ -57,8 +57,7 @@ public class User implements UserDetails {
     @CreationTimestamp
     private Date createDate;
 
-    @NotNull(message = "Enable is required")
-    private GenderEnum genderEnum;
+    private GenderEnum gender;
 
     private String avatar;
     private String nickname;

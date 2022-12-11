@@ -21,13 +21,7 @@ import java.util.UUID;
 public class Chat {
 
     @Id
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(
-            name = "UUID",
-            strategy = "org.hibernate.id.UUIDGenerator"
-    )
-    @Column(length = 16)
-    private UUID id;
+    private String id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_from", referencedColumnName = "username")
@@ -52,7 +46,7 @@ public class Chat {
     private Integer type;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "reaction_id", referencedColumnName = "id")
+    @JoinColumn(name = "reaction", referencedColumnName = "name")
     private Reaction reaction;
 
     @NotNull(message = "Status is required")

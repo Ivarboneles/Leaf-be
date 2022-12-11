@@ -3,14 +3,23 @@ package com.example.leaf.controller.customer;
 import com.example.leaf.dto.request.CommentRequestDTO;
 import com.example.leaf.dto.request.PostRequestDTO;
 import com.example.leaf.dto.request.ReactionRequestDTO;
+import com.example.leaf.services.ImageService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.mail.Multipart;
 import java.util.UUID;
 
 @RestController
 @RequestMapping(value = "/api/v1/post")
 public class PostController {
+
+    @Autowired
+    ImageService imageService;
+
 
     @GetMapping(value = "/user/{username}")
     public ResponseEntity<?> getAllPostByUser(@PathVariable(name = "username") String username){
@@ -55,4 +64,5 @@ public class PostController {
                                                 @RequestBody ReactionRequestDTO reactionRequestDTO){
         return ResponseEntity.ok().build();
     }
+
 }

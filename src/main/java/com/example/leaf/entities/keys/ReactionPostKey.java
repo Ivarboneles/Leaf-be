@@ -15,8 +15,8 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ReactionPostKey implements Serializable{
 
-    private UUID post;
-    private UUID reaction;
+    private String post;
+    private String reaction;
 
     @Override
     public int hashCode() {

@@ -14,8 +14,8 @@ import java.util.UUID;
 @NoArgsConstructor
 public class ReactionCommentKey implements Serializable {
 
-    private UUID comment;
-    private UUID reaction;
+    private String comment;
+    private String reaction;
 
     @Override
     public int hashCode() {

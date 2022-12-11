@@ -19,16 +19,7 @@ import java.util.UUID;
 @Table(name = "reaction")
 public class Reaction {
     @Id
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(
-            name = "UUID",
-            strategy = "org.hibernate.id.UUIDGenerator"
-    )
-    @Column(length = 16)
-    private UUID id;
-
-    @NotNull(message = "Reaction name is required")
-    private ReactEnum name;
+    private String name;
 
     @NotNull(message = "Status is required")
     private StatusEnum statusEnum;

@@ -44,9 +44,21 @@ public class LoginController {
                     description = "Successful",
                     content = { @Content(mediaType = "application/json") })
     })
-    @PostMapping(value = "/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequestDTO body) throws LoginException {
+    @PostMapping(value = "/login/customer")
+    public ResponseEntity<?> loginCustomer(@RequestBody LoginRequestDTO body) throws LoginException {
         return ResponseEntity.ok(login(body, RoleEnum.CUSTOMER));
+    }
+
+    @Operation(
+            summary = "Login API for admin")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "Successful",
+                    content = { @Content(mediaType = "application/json") })
+    })
+    @PostMapping(value = "/login/admin")
+    public ResponseEntity<?> loginAdmin(@RequestBody LoginRequestDTO body) throws LoginException {
+        return ResponseEntity.ok(login(body, RoleEnum.ADMIN));
     }
 
     public LoginResponseDTO<?> login(LoginRequestDTO body, RoleEnum r) throws LoginException {

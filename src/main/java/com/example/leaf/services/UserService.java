@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.mail.MessagingException;
 import javax.transaction.Transactional;
@@ -19,12 +20,14 @@ import java.util.List;
 import java.util.Optional;
 
 public interface UserService {
-    DataResponse<?> saveUser(UserRequestDTO userRequestDTO, String siteUrl)
-            throws MessagingException, UnsupportedEncodingException;
+    DataResponse<?> saveUser(UserRequestDTO userRequestDTO);
     DataResponse<?> updateUser(String username, UserRequestDTO userRequestDTO);
     DataResponse<?> changePassword(String username, ChangePasswordRequestDTO changePasswordRequestDTO);
     DataResponse<?> getUserById(String username);
     DataResponse<?> verifyUser(String verifyCode);
+
+    DataResponse<?> changeAvatar(User user, MultipartFile avatar);
+
 }
 
 
