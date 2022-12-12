@@ -1,5 +1,6 @@
 package com.example.leaf.dto.request;
 
+import com.example.leaf.entities.enums.StatusEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,5 +14,7 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 public class RelationShipRequestDTO {
     @NotNull
-    private String content;
+    private String usernameTo;
+    @NotNull
+    private StatusEnum status;
 }

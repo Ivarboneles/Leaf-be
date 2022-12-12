@@ -1,6 +1,7 @@
 package com.example.leaf.controller;
 
 import com.example.leaf.dto.request.LoginRequestDTO;
+import com.example.leaf.dto.response.DataResponse;
 import com.example.leaf.dto.response.LoginResponseDTO;
 import com.example.leaf.dto.response.ResponseObject;
 import com.example.leaf.entities.enums.RoleEnum;
@@ -61,7 +62,7 @@ public class LoginController {
         return ResponseEntity.ok(login(body, RoleEnum.ADMIN));
     }
 
-    public LoginResponseDTO<?> login(LoginRequestDTO body, RoleEnum r) throws LoginException {
+    public DataResponse<?> login(LoginRequestDTO body, RoleEnum r) throws LoginException {
         return loginService.authenticateWithUsernamePassword(body.getLoginKey(), body.getPassword(), r);
     }
 

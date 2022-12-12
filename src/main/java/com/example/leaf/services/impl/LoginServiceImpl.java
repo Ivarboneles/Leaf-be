@@ -1,5 +1,6 @@
 package com.example.leaf.services.impl;
 
+import com.example.leaf.dto.response.DataResponse;
 import com.example.leaf.dto.response.LoginResponseDTO;
 import com.example.leaf.dto.response.UserResponseDTO;
 import com.example.leaf.entities.User;
@@ -9,6 +10,7 @@ import com.example.leaf.repositories.UserRepository;
 import com.example.leaf.services.LoginService;
 import com.example.leaf.utils.JwtTokenUtil;
 
+import com.example.leaf.utils.ServiceUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -35,8 +37,11 @@ public class LoginServiceImpl implements LoginService {
     @Autowired
     JwtTokenUtil jwtUtil;
 
+    @Autowired
+    ServiceUtils serviceUtils;
+
     @Override
-    public LoginResponseDTO<?> authenticateWithUsernamePassword(String username, String password, RoleEnum requestedRole) throws LoginException {
+    public DataResponse<?> authenticateWithUsernamePassword(String username, String password, RoleEnum requestedRole) throws LoginException {
         Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
         SecurityContextHolder.getContext().setAuthentication(auth);
 
@@ -48,15 +53,15 @@ public class LoginServiceImpl implements LoginService {
         String r = user.getRole().getName();
 
         if (requestedRole.equals(RoleEnum.CUSTOMER) && requestedRole.toString().equals(r)) { // buyer
-            return new LoginResponseDTO<>(
+            return new DataResponse<>(new LoginResponseDTO<>(
                     token,
-                    mapper.map(user, UserResponseDTO.class)
+                    mapper.map(user, UserResponseDTO.class))
             );
         }
         else if (requestedRole.equals(RoleEnum.ADMIN) && !r.equals(RoleEnum.CUSTOMER.toString())) {
-            return new LoginResponseDTO<>(
+            return new DataResponse<>(new LoginResponseDTO<>(
                     token,
-                    mapper.map(user, UserResponseDTO.class)
+                    mapper.map(user, UserResponseDTO.class))
             );
         }
         else {

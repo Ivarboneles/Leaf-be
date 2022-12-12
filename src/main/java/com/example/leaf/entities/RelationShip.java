@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -30,8 +31,7 @@ public class RelationShip {
     @JoinColumn(name = "user_to")
     private User userTo;
 
-    @NotNull(message = "Create date is required")
-    @Temporal(TemporalType.DATE)
+    @CreationTimestamp
     private Date createDate;
 
     @NotNull(message = "Status is required")
