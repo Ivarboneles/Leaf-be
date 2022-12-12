@@ -8,6 +8,7 @@ import com.example.leaf.dto.response.DataResponse;
 import com.example.leaf.dto.response.UserResponseDTO;
 import com.example.leaf.entities.Role;
 import com.example.leaf.entities.User;
+import com.example.leaf.entities.enums.GenderEnum;
 import com.example.leaf.entities.enums.RoleEnum;
 import com.example.leaf.exceptions.InvalidValueException;
 import com.example.leaf.exceptions.ResourceAlreadyExistsException;
@@ -88,6 +89,7 @@ public class UserServiceImpl implements UserService {
         // Check role already exists
         user.setRole(roleRepository.findRoleByName(RoleEnum.CUSTOMER.toString()).get());
         user.setEnable(true);
+        user.setGender(GenderEnum.MALE);
 
         String randomCodeVerify = RandomString.make(64);
         user.setVerificationCode(randomCodeVerify);
