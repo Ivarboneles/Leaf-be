@@ -1,7 +1,9 @@
 package com.example.leaf.services.impl;
 
 import com.example.leaf.dto.request.ChangePasswordRequestDTO;
-import com.example.leaf.dto.request.UserRequestDTO;
+import com.example.leaf.dto.request.ForgotPasswordRequestDTO;
+import com.example.leaf.dto.request.RegisterUserRequestDTO;
+import com.example.leaf.dto.request.UserUpdateRequestDTO;
 import com.example.leaf.dto.response.DataResponse;
 import com.example.leaf.dto.response.UserResponseDTO;
 import com.example.leaf.entities.Role;
@@ -61,23 +63,23 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public DataResponse<?> saveUser(UserRequestDTO userRequestDTO) {
-        User user =  mapper.map(userRequestDTO, User.class);
+    public DataResponse<?> saveUser(RegisterUserRequestDTO registerUserRequestDTO) {
+        User user =  mapper.map(registerUserRequestDTO, User.class);
 
         // Check phone user existed
-        Optional<User> userCheckUsername = userRepository.findUserByUsername(userRequestDTO.getUsername());
+        Optional<User> userCheckUsername = userRepository.findUserByUsername(registerUserRequestDTO.getUsername());
         if (userCheckUsername.isPresent()) {
             throw new ResourceAlreadyExistsException("Username user existed");
         }
 
         // Check phone user existed
-        Optional<User> userCheckPhone = userRepository.findUserByPhone(userRequestDTO.getPhone());
+        Optional<User> userCheckPhone = userRepository.findUserByPhone(registerUserRequestDTO.getPhone());
         if (userCheckPhone.isPresent()) {
             throw new ResourceAlreadyExistsException("Phone user existed");
         }
 
         // Check email user existed
-        Optional<User> userCheckEmail = userRepository.findUserByEmail(userRequestDTO.getEmail());
+        Optional<User> userCheckEmail = userRepository.findUserByEmail(registerUserRequestDTO.getEmail());
         if (userCheckEmail.isPresent()) {
             throw new ResourceAlreadyExistsException("Email user existed");
         }
@@ -93,39 +95,48 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public DataResponse<?> updateUser(String username, UserRequestDTO userRequestDTO) {
-        User user = mapper.map(userRequestDTO, User.class);
-        User userExists = userRepository.findById(username)
-                .orElseThrow(() -> new ResourceNotFoundException("Could not find user with ID = " + username));
+    public DataResponse<?> updateUser(User user, UserUpdateRequestDTO userUpdateRequestDTO) {
 
-        // Check email user existed
-        if (!user.getEmail().equals(userExists.getEmail())) {
-            Optional<User> userCheckEmail = userRepository.findUserByEmail(userRequestDTO.getEmail());
-            if (userCheckEmail.isPresent()) {
-                throw new ResourceAlreadyExistsException("Email user existed");
+        if(userUpdateRequestDTO.getPhone() != null){
+            if(!user.getPhone().equals(userUpdateRequestDTO.getPhone())){
+                Optional<User> userOptional = userRepository.findUserByPhone(userUpdateRequestDTO.getPhone());
+                if(userOptional.isPresent()){
+                    throw new ResourceNotFoundException("Phone has already!");
+                }
+                user.setPhone(userUpdateRequestDTO.getPhone());
             }
         }
 
-        // Check phone user existed
-        if (!user.getPhone().equals(userExists.getPhone())) {
-            Optional<User> userCheckPhone = userRepository.findUserByPhone(userRequestDTO.getPhone());
-            if (userCheckPhone.isPresent()) {
-                throw new ResourceAlreadyExistsException("Phone user existed");
+        if (userUpdateRequestDTO.getName() != null){
+            if(!user.getName().equals(userUpdateRequestDTO.getName())){
+                user.setName(userUpdateRequestDTO.getName());
             }
         }
 
-        //Update password
-        if (userRequestDTO.getPassword() == null){
-            user.setPassword(userExists.getPassword());
-        } else {
-            encodePassword(user);
+        if(userUpdateRequestDTO.getBirthday() != null){
+            if(user.getBirthday() != userUpdateRequestDTO.getBirthday()){
+                user.setBirthday(userUpdateRequestDTO.getBirthday());
+            }
         }
 
+        if(userUpdateRequestDTO.getBio() != null){
+            if(user.getBio().equals(userUpdateRequestDTO.getBio())){
+                user.setBio(userUpdateRequestDTO.getBio());
+            }
+        }
 
-        // Check role already exists
-        Role role = roleRepository.findRoleByName(user.getRole().getName())
-                .orElseThrow(() -> new ResourceNotFoundException("Could not find role with ID = " + user.getRole().getName()));
-        user.setRole(role);
+       if(userUpdateRequestDTO.getGender() != null){
+           if(!user.getGender().equals(userUpdateRequestDTO.getGender())){
+               user.setGender(userUpdateRequestDTO.getGender());
+           }
+       }
+
+       if(userUpdateRequestDTO.getNickname() != null){
+           if(!user.getNickname().equals(userUpdateRequestDTO.getNickname())){
+               user.setNickname(userUpdateRequestDTO.getNickname());
+           }
+       }
+
         return serviceUtils.convertToDataResponse(userRepository.save(user), UserResponseDTO.class);
     }
 
@@ -170,6 +181,21 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public DataResponse<?> sendVerifyCode(String email) {
+        User user = userRepository.findUserByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Can't find user " + email));
+        try{
+            sendVerificationEmail(user, email);
+        }catch (Exception e){
+            throw new InvalidValueException("Can't not connect to your email");
+        }
+
+        DataResponse dataResponse = new DataResponse();
+        dataResponse.setMessage("The verify code is sent your email!");
+        return dataResponse;
+    }
+
+    @Override
     public DataResponse<?> changeAvatar(User user, MultipartFile avatar) {
         try{
             String fileName = imageService.save(avatar);
@@ -184,6 +210,37 @@ public class UserServiceImpl implements UserService {
             throw new InvalidValueException("Can't upload file");
         }
     }
+
+    @Override
+    public DataResponse<?> changeEmail(User user, String email) {
+        if(email != null){
+            if(!user.getEmail().equals(email)){
+                Optional<User> userOptional = userRepository.findUserByEmail(email);
+
+                if(userOptional.isPresent()){
+                    throw new ResourceNotFoundException("Email has already");
+                }
+                user.setEmail(email);
+            }
+        }
+        return serviceUtils.convertToDataResponse(userRepository.save(user), UserResponseDTO.class);
+    }
+
+    @Override
+    public DataResponse<?> forgotPassword(User user, ForgotPasswordRequestDTO forgotPasswordRequestDTO) {
+       if(user.getVerificationCode().equals(forgotPasswordRequestDTO.getVerifyCode())){
+           if(forgotPasswordRequestDTO.getNewPassword() != null){
+               user.setPassword(forgotPasswordRequestDTO.getNewPassword());
+               encodePassword(user);
+           }
+       }else{
+           throw new InvalidValueException("Verify email failed!");
+       }
+
+        return serviceUtils.convertToDataResponse(userRepository.save(user), UserResponseDTO.class);
+
+    }
+
     private void encodePassword(User user) {
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);

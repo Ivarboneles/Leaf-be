@@ -9,10 +9,9 @@ import javax.validation.constraints.NotNull;
 @Getter
 @Setter
 @NoArgsConstructor
-public class VerifyRequestDTO {
-
+public class ForgotPasswordRequestDTO {
     @NotNull
-    String email;
+    private String newPassword;
     @NotNull
-    String code;
+    private String verifyCode;
 }

@@ -27,6 +27,9 @@ public class Comment {
     @JoinColumn(name = "user", referencedColumnName = "username")
     private User user;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "post", referencedColumnName = "id")
+    private Post post;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "father_id", referencedColumnName = "id")

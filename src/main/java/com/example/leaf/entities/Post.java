@@ -10,6 +10,7 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -39,4 +40,7 @@ public class Post {
 
     @NotNull(message = "Status is required")
     private StatusEnum statusEnum;
+
+    @OneToMany(mappedBy = "post")
+    private List<Comment> comments;
 }
