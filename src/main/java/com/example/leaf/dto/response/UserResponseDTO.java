@@ -22,7 +22,7 @@ public class UserResponseDTO {
     private String email;
     private Address address;
     private String birthday;
-    private String genderEnum;
+    private String gender;
     private String nickname;
     private String bio;
     private Boolean enable;
