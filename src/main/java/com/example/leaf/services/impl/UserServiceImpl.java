@@ -89,7 +89,7 @@ public class UserServiceImpl implements UserService {
         // Check role already exists
         user.setRole(roleRepository.findRoleByName(RoleEnum.CUSTOMER.toString()).get());
         user.setEnable(true);
-        user.setGender(GenderEnum.MALE);
+        user.setGender(GenderEnum.MALE.toString());
 
         String randomCodeVerify = RandomString.make(64);
         user.setVerificationCode(randomCodeVerify);

@@ -57,7 +57,7 @@ public class User implements UserDetails {
     @CreationTimestamp
     private Date createDate;
 
-    private GenderEnum gender;
+    private String gender;
 
     private String avatar;
     private String nickname;

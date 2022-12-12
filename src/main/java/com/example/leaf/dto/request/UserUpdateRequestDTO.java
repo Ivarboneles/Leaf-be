@@ -21,7 +21,7 @@ public class UserUpdateRequestDTO {
     @Size(max = 12, min = 9)
     private String phone;
     private Date birthday;
-    private GenderEnum gender;
+    private String gender;
     private String nickname;
     private String bio;
 
