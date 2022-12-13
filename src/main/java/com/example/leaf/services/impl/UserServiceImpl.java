@@ -90,6 +90,7 @@ public class UserServiceImpl implements UserService {
         user.setRole(roleRepository.findRoleByName(RoleEnum.CUSTOMER.toString()).get());
         user.setEnable(true);
         user.setGender(GenderEnum.MALE.toString());
+        user.setAvatar("https://storage.googleapis.com/leaf-5c2c4.appspot.com/39f94986-d898-49dd-b9eb-5ff979857ab9png");
 
         String randomCodeVerify = RandomString.make(64);
         user.setVerificationCode(randomCodeVerify);

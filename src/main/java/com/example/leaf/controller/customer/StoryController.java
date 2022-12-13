@@ -12,7 +12,7 @@ import java.util.UUID;
 @RequestMapping(value = "/api/v1/story")
 public class StoryController {
 
-    @GetMapping(value = "/user/{username}")
+    @GetMapping(value = "/user")
     public ResponseEntity<?> getAllStoryByUser( @PathVariable(name = "username") String username){
         return ResponseEntity.ok().build();
     }

@@ -20,7 +20,7 @@ public class PostController {
     @Autowired
     ImageService imageService;
 
-    @GetMapping(value = "/user/{username}")
+    @GetMapping(value = "/user")
     public ResponseEntity<?> getAllPostByUser(@PathVariable(name = "username") String username){
         return ResponseEntity.ok().build();
     }

@@ -20,7 +20,7 @@ public class RelationshipController {
 
     @Autowired
     JwtTokenUtil jwtTokenUtil;
-    @GetMapping(value = "/user/{username}")
+    @GetMapping(value = "/user")
     public ResponseEntity<?> getAllRelationShipByUser(@PathVariable(name = "username") String username){
         return ResponseEntity.ok().build();
     }

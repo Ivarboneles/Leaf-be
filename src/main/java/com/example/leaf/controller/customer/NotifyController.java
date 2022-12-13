@@ -9,7 +9,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping(value = "/api/v1/notify")
 public class NotifyController {
-    @GetMapping(value = "/user/{username}")
+    @GetMapping(value = "/user")
     public ResponseEntity<?> getAllNotifyByUser(@PathVariable(name = "username") String username){
         return ResponseEntity.ok().build();
     }

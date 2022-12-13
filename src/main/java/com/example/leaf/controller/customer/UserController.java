@@ -21,23 +21,19 @@ public class UserController {
     @Autowired
     JwtTokenUtil jwtTokenUtil;
 
-    @GetMapping(value = "/{username}")
-    public ResponseEntity<?> getUserById (@PathVariable(name = "username") String username) {
-        return ResponseEntity.ok( userService.getUserById(username));
-    }
 
     @PostMapping(value = "/create")
     public ResponseEntity<?> createUser(@RequestBody RegisterUserRequestDTO registerUserRequestDTO) {
         return ResponseEntity.ok(userService.saveUser(registerUserRequestDTO));
     }
 
-    @PutMapping(value = "/update-profile/{username}")
+    @PutMapping(value = "/update-profile")
     public ResponseEntity<?> updateProfile(@RequestBody UserUpdateRequestDTO userUpdateRequestDTO,
                                            HttpServletRequest request){
         return  ResponseEntity.ok(userService.updateUser(jwtTokenUtil.getUserDetails(JwtTokenUtil.getAccessToken(request)), userUpdateRequestDTO));
     }
 
-    @PutMapping(value = "/change-password/{username}")
+    @PutMapping(value = "/change-password")
     public ResponseEntity<?> changePassword(@PathVariable(name = "username") String username,@RequestBody ChangePasswordRequestDTO changePasswordRequestDTO){
         return  ResponseEntity.ok(userService.changePassword(username, changePasswordRequestDTO));
     }
