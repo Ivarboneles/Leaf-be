@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -21,7 +22,7 @@ public class UserResponseDTO {
     private String phone;
     private String email;
     private Address address;
-    private String birthday;
+    private Date birthday;
     private String gender;
     private String nickname;
     private String bio;
