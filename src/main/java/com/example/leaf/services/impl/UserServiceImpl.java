@@ -123,9 +123,7 @@ public class UserServiceImpl implements UserService {
         }
 
         if(userUpdateRequestDTO.getBio() != null){
-            if(user.getBio().equals(userUpdateRequestDTO.getBio())){
-                user.setBio(userUpdateRequestDTO.getBio());
-            }
+            user.setBio(userUpdateRequestDTO.getBio());
         }
 
        if(userUpdateRequestDTO.getGender() != null){
@@ -135,9 +133,7 @@ public class UserServiceImpl implements UserService {
        }
 
        if(userUpdateRequestDTO.getNickname() != null){
-           if(!user.getNickname().equals(userUpdateRequestDTO.getNickname())){
-               user.setNickname(userUpdateRequestDTO.getNickname());
-           }
+           user.setNickname(userUpdateRequestDTO.getNickname());
        }
 
         return serviceUtils.convertToDataResponse(userRepository.save(user), UserResponseDTO.class);
