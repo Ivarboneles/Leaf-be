@@ -70,4 +70,14 @@ public class UserController {
                 jwtTokenUtil.getUserDetails(JwtTokenUtil.getAccessToken(request)) , forgotPasswordRequestDTO));
 
     }
+
+    @GetMapping(value = "/{username}")
+    public ResponseEntity<?> getUser(@PathVariable("username") String username){
+        return ResponseEntity.ok(userService.getUserById(username));
+    }
+
+    @GetMapping(value = "/search/{name}")
+    public ResponseEntity<?> searchUser(@PathVariable("name") String name){
+        return ResponseEntity.ok(userService.searchUser(name));
+    }
 }

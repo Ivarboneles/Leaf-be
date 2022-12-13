@@ -5,6 +5,7 @@ import com.example.leaf.dto.request.ForgotPasswordRequestDTO;
 import com.example.leaf.dto.request.RegisterUserRequestDTO;
 import com.example.leaf.dto.request.UserUpdateRequestDTO;
 import com.example.leaf.dto.response.DataResponse;
+import com.example.leaf.dto.response.ListResponse;
 import com.example.leaf.entities.User;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,6 +24,7 @@ public interface UserService {
 
     DataResponse<?> forgotPassword(User user, ForgotPasswordRequestDTO forgotPasswordRequestDTO);
 
+    ListResponse<?> searchUser(String name);
 }
 
 

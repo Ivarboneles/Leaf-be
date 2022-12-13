@@ -5,6 +5,8 @@ import com.example.leaf.dto.request.ForgotPasswordRequestDTO;
 import com.example.leaf.dto.request.RegisterUserRequestDTO;
 import com.example.leaf.dto.request.UserUpdateRequestDTO;
 import com.example.leaf.dto.response.DataResponse;
+import com.example.leaf.dto.response.ListResponse;
+import com.example.leaf.dto.response.SearchUserResponseDTO;
 import com.example.leaf.dto.response.UserResponseDTO;
 import com.example.leaf.entities.Role;
 import com.example.leaf.entities.User;
@@ -238,6 +240,11 @@ public class UserServiceImpl implements UserService {
 
         return serviceUtils.convertToDataResponse(userRepository.save(user), UserResponseDTO.class);
 
+    }
+
+    @Override
+    public ListResponse<?> searchUser(String name) {
+        return serviceUtils.convertToListResponse(userRepository.searchByName(name), SearchUserResponseDTO.class) ;
     }
 
     private void encodePassword(User user) {
