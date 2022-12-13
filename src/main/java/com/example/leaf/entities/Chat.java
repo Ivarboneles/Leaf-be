@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -36,7 +37,7 @@ public class Chat {
     private Chat chat;
 
     @NotNull(message = "Create date is required")
-    @Temporal(TemporalType.DATE)
+    @CreationTimestamp
     private Date createDate;
 
     @NotNull(message = "Value is required")
@@ -50,5 +51,5 @@ public class Chat {
     private Reaction reaction;
 
     @NotNull(message = "Status is required")
-    private StatusEnum statusEnum;
+    private String status;
 }

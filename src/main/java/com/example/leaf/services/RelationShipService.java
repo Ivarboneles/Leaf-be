@@ -8,5 +8,7 @@ public interface RelationShipService {
 
     DataResponse<?> createRelationShip(User userFrom, String usernameTo);
 
-    DataResponse<?> updateRelationShip(User userFrom, String usernameTo, StatusEnum status);
+    DataResponse<?> updateRelationShip(User userFrom, String usernameTo, String status);
+
+    DataResponse<?> deleteRelationShip(User user, String friend);
 }

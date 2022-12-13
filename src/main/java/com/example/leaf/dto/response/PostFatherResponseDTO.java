@@ -1,10 +1,9 @@
-package com.example.leaf.dto.request;
+package com.example.leaf.dto.response;
 
 import com.example.leaf.entities.Comment;
 import com.example.leaf.entities.Post;
 import com.example.leaf.entities.User;
 import com.example.leaf.entities.enums.StatusEnum;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,17 +16,11 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
-public class PostRequestDTO {
-
-    private String fatherId;
-
-    @NotNull(message = "Value is required")
+public class PostFatherResponseDTO {
+    private String id;
+    private SearchUserResponseDTO user;
+    private Date createDate;
     private String value;
-
-    @NotNull(message = "Status is required")
-    private String status;
-
-    @OneToMany(mappedBy = "post")
-    private List<Comment> comments;
+    private List<CommentOfPostResponseDTO> comments;
+    private List<FileOfPostResponseDTO> files;
 }

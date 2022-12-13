@@ -6,6 +6,7 @@ import com.example.leaf.entities.RelationShip;
 import com.example.leaf.entities.User;
 import com.example.leaf.entities.enums.StatusEnum;
 import com.example.leaf.entities.keys.RelationShipKey;
+import com.example.leaf.exceptions.InvalidValueException;
 import com.example.leaf.exceptions.ResourceNotFoundException;
 import com.example.leaf.repositories.RelationShipRepository;
 import com.example.leaf.repositories.UserRepository;
@@ -34,12 +35,12 @@ public class RelationShipServiceImpl implements RelationShipService {
         RelationShip relationShip = new RelationShip();
         relationShip.setUserFrom(userFrom);
         relationShip.setUserTo(userTo);
-        relationShip.setStatusEnum(StatusEnum.FOLLOWING);
+        relationShip.setStatus(StatusEnum.FOLLOWING.toString());
         return new DataResponse<>(relationShipRepository.save(relationShip)) ;
     }
 
     @Override
-    public DataResponse<?> updateRelationShip(User userFrom, String usernameTo, StatusEnum status) {
+    public DataResponse<?> updateRelationShip(User userFrom, String usernameTo, String status) {
         User userTo = userRepository.findUserByUsername(usernameTo)
                 .orElseThrow(() -> new ResourceNotFoundException("Not found user " + usernameTo));
         RelationShip relationShip = relationShipRepository.
@@ -47,7 +48,21 @@ public class RelationShipServiceImpl implements RelationShipService {
                 orElseThrow(() ->
                         new ResourceNotFoundException("Can't found relationship of user "+
                                 userFrom.getUsername() + " and user " + usernameTo));
-        relationShip.setStatusEnum(status);
+        relationShip.setStatus(status);
         return new DataResponse<>(relationShipRepository.save(relationShip));
+    }
+
+    @Override
+    public DataResponse<?> deleteRelationShip(User user, String friend) {
+        User userTo = userRepository.findUserByUsername(friend)
+                .orElseThrow(() -> new ResourceNotFoundException("Not found user " + friend));
+        try{
+            relationShipRepository.deleteById(new RelationShipKey(user.getUsername(), friend));
+        }catch (Exception e){
+            throw new InvalidValueException("Can't delete relationship!");
+        }
+        DataResponse dataResponse = new DataResponse<>();
+        dataResponse.setMessage("Delete Relationship successful!");
+        return dataResponse;
     }
 }

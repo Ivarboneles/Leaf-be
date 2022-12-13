@@ -42,8 +42,12 @@ public class RelationshipController {
                 , relationShipRequestDTO.getUsernameTo(), relationShipRequestDTO.getStatus()));
     }
 
-    @DeleteMapping(value = "/{id}")
-    public ResponseEntity<?> deleteRelationShip(@PathVariable(name= "id") UUID id){
-        return ResponseEntity.ok().build();
+    @DeleteMapping(value = "/{friend}")
+    public ResponseEntity<?> deleteRelationShip(@PathVariable(name= "friend") String friend,
+                                                HttpServletRequest request){
+        return ResponseEntity.ok(relationShipService.deleteRelationShip(
+                jwtTokenUtil.getUserDetails(JwtTokenUtil.getAccessToken(request)),
+                friend
+        ));
     }
 }

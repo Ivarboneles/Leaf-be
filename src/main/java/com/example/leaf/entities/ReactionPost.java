@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.util.Date;
 
@@ -35,10 +36,10 @@ public class ReactionPost {
     private User user;
 
     @NotNull(message = "Create date is required")
-    @Temporal(TemporalType.DATE)
+    @CreationTimestamp
     private Date createDate;
 
 
     @NotNull(message = "Status is required")
-    private StatusEnum statusEnum;
+    private String status;
 }

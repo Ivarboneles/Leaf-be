@@ -1,0 +1,15 @@
+package com.example.leaf.dto.response;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
+public class FileOfPostResponseDTO {
+
+    private String value;
+    private Integer type;
+    private String status;
+}

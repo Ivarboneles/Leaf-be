@@ -80,4 +80,18 @@ public class UserController {
     public ResponseEntity<?> searchUser(@PathVariable("name") String name){
         return ResponseEntity.ok(userService.searchUser(name));
     }
+
+    @GetMapping(value = "/list-friend")
+    public ResponseEntity<?> getListFriend(HttpServletRequest request){
+        return ResponseEntity.ok(userService.getListFriend(
+                jwtTokenUtil.getUserDetails(JwtTokenUtil.getAccessToken(request))
+        ));
+    }
+
+    @GetMapping(value = "/list-post")
+    public ResponseEntity<?> getListPost(HttpServletRequest request){
+        return ResponseEntity.ok(userService.getListPost(
+                jwtTokenUtil.getUserDetails(JwtTokenUtil.getAccessToken(request))
+        ));
+    }
 }

@@ -39,5 +39,5 @@ public class Address {
     private String addressDetail;
 
     @NotNull(message = "Status is required")
-    private StatusEnum statusEnum;
+    private String status;
 }

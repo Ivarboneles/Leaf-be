@@ -1,10 +1,9 @@
-package com.example.leaf.dto.request;
+package com.example.leaf.dto.response;
 
 import com.example.leaf.entities.Comment;
 import com.example.leaf.entities.Post;
 import com.example.leaf.entities.User;
 import com.example.leaf.entities.enums.StatusEnum;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,22 +11,16 @@ import lombok.Setter;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
-import java.util.List;
 
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
-public class PostRequestDTO {
+public class CommentOfPostResponseDTO {
 
-    private String fatherId;
-
-    @NotNull(message = "Value is required")
+    private SearchUserResponseDTO user;
+    private CommentFatherResponseDTO comment;
     private String value;
-
-    @NotNull(message = "Status is required")
+    private Integer type;
+    private Date createDate;
     private String status;
-
-    @OneToMany(mappedBy = "post")
-    private List<Comment> comments;
 }

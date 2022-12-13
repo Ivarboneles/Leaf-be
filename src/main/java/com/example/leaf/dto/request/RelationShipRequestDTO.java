@@ -16,5 +16,5 @@ public class RelationShipRequestDTO {
     @NotNull
     private String usernameTo;
     @NotNull
-    private StatusEnum status;
+    private String status;
 }

@@ -22,5 +22,5 @@ public class Reaction {
     private String name;
 
     @NotNull(message = "Status is required")
-    private StatusEnum statusEnum;
+    private String status;
 }

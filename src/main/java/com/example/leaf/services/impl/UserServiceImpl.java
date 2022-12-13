@@ -5,14 +5,16 @@ import com.example.leaf.dto.request.ForgotPasswordRequestDTO;
 import com.example.leaf.dto.request.RegisterUserRequestDTO;
 import com.example.leaf.dto.request.UserUpdateRequestDTO;
 import com.example.leaf.dto.response.*;
-import com.example.leaf.entities.Role;
 import com.example.leaf.entities.User;
 import com.example.leaf.entities.enums.GenderEnum;
 import com.example.leaf.entities.enums.RoleEnum;
+import com.example.leaf.entities.enums.StatusEnum;
 import com.example.leaf.exceptions.InvalidValueException;
 import com.example.leaf.exceptions.ResourceAlreadyExistsException;
 import com.example.leaf.exceptions.ResourceNotFoundException;
 
+import com.example.leaf.repositories.PostRepository;
+import com.example.leaf.repositories.RelationShipRepository;
 import com.example.leaf.repositories.RoleRepository;
 import com.example.leaf.repositories.UserRepository;
 import com.example.leaf.services.ImageService;
@@ -61,6 +63,11 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private JavaMailSender mailSender;
+
+    @Autowired
+    RelationShipRepository relationShipRepository;
+    @Autowired
+    PostRepository postRepository;
 
     @Autowired
     JwtTokenUtil jwtTokenUtil;
@@ -249,6 +256,16 @@ public class UserServiceImpl implements UserService {
     @Override
     public ListResponse<?> searchUser(String name) {
         return serviceUtils.convertToListResponse(userRepository.searchByName(name), SearchUserResponseDTO.class) ;
+    }
+
+    @Override
+    public ListResponse<?> getListFriend(User user) {
+        return serviceUtils.convertToListResponse(relationShipRepository.findAllByUserFromOrUserTo(user,user), FriendResponseDTO.class);
+    }
+
+    @Override
+    public ListResponse<?> getListPost(User user) {
+        return serviceUtils.convertToListResponse(postRepository.findAllByUserAndStatus(user, StatusEnum.ENABLE.toString()), PostOfUserResponseDTO.class);
     }
 
     private void encodePassword(User user) {

@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -28,7 +29,7 @@ public class Notify {
     private User user;
 
     @NotNull(message = "Create date is required")
-    @Temporal(TemporalType.DATE)
+    @CreationTimestamp
     private Date createDate;
 
 
@@ -36,6 +37,6 @@ public class Notify {
     private String value;
 
     @NotNull(message = "Status is required")
-    private StatusEnum statusEnum;
+    private String status;
 
 }

@@ -25,6 +25,10 @@ public interface UserService {
     DataResponse<?> forgotPassword(User user, ForgotPasswordRequestDTO forgotPasswordRequestDTO);
 
     ListResponse<?> searchUser(String name);
+
+    ListResponse<?> getListFriend(User user);
+
+    ListResponse<?> getListPost(User user);
 }
 
 

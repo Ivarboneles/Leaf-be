@@ -35,6 +35,6 @@ public class RelationShip {
     private Date createDate;
 
     @NotNull(message = "Status is required")
-    private StatusEnum statusEnum;
+    private String status;
 
 }

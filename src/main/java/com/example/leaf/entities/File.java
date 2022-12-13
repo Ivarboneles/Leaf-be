@@ -34,5 +34,5 @@ public class File {
     private Integer type;
 
     @NotNull(message = "Status is required")
-    private StatusEnum statusEnum;
+    private String status;
 }
