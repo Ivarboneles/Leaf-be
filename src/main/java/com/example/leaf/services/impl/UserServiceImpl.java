@@ -4,10 +4,7 @@ import com.example.leaf.dto.request.ChangePasswordRequestDTO;
 import com.example.leaf.dto.request.ForgotPasswordRequestDTO;
 import com.example.leaf.dto.request.RegisterUserRequestDTO;
 import com.example.leaf.dto.request.UserUpdateRequestDTO;
-import com.example.leaf.dto.response.DataResponse;
-import com.example.leaf.dto.response.ListResponse;
-import com.example.leaf.dto.response.SearchUserResponseDTO;
-import com.example.leaf.dto.response.UserResponseDTO;
+import com.example.leaf.dto.response.*;
 import com.example.leaf.entities.Role;
 import com.example.leaf.entities.User;
 import com.example.leaf.entities.enums.GenderEnum;
@@ -20,6 +17,7 @@ import com.example.leaf.repositories.RoleRepository;
 import com.example.leaf.repositories.UserRepository;
 import com.example.leaf.services.ImageService;
 import com.example.leaf.services.UserService;
+import com.example.leaf.utils.JwtTokenUtil;
 import com.example.leaf.utils.ServiceUtils;
 import net.bytebuddy.utility.RandomString;
 
@@ -63,6 +61,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private JavaMailSender mailSender;
+
+    @Autowired
+    JwtTokenUtil jwtTokenUtil;
 
 
     @Override
@@ -138,7 +139,10 @@ public class UserServiceImpl implements UserService {
            user.setNickname(userUpdateRequestDTO.getNickname());
        }
 
-        return serviceUtils.convertToDataResponse(userRepository.save(user), UserResponseDTO.class);
+       String token = jwtTokenUtil.generateToken(user);
+
+       return new DataResponse<>( new LoginResponseDTO<>(token, mapper.map( userRepository.save(user), UserResponseDTO.class )));
+
     }
 
     @Override
