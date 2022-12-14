@@ -82,9 +82,6 @@ public class PostServiceImpl implements PostService {
         Post post = postRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("Can't find post")
         );
-        if(postRequestDTO.getStatus() != null){
-            post.setStatus(postRequestDTO.getStatus());
-        }
 
         if(postRequestDTO.getValue() != null){
             post.setValue(postRequestDTO.getValue());
