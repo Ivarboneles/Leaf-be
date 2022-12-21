@@ -19,8 +19,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PostRequestDTO {
-
-    private String fatherId;
     @NotNull(message = "Value is required")
     private String value;
 }

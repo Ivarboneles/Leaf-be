@@ -6,6 +6,8 @@ import com.example.leaf.dto.request.ReactionRequestDTO;
 import com.example.leaf.services.ImageService;
 import com.example.leaf.services.PostService;
 import com.example.leaf.utils.JwtTokenUtil;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Encoding;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -30,8 +32,10 @@ public class PostController {
     JwtTokenUtil jwtTokenUtil;
 
     @GetMapping(value = "/user")
-    public ResponseEntity<?> getAllPostByUser(@PathVariable(name = "username") String username){
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> getAllPostByUser(HttpServletRequest request){
+        return ResponseEntity.ok(postService.getListPostOfUser(
+                jwtTokenUtil.getUserDetails(JwtTokenUtil.getAccessToken(request))
+        ));
     }
 
     @GetMapping(value = "/{id}")
@@ -39,12 +43,15 @@ public class PostController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping
-    public ResponseEntity<?> createPost(@RequestBody PostRequestDTO postRequestDTO,
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(encoding = @Encoding(name = "postRequestDTO", contentType = "application/json")))
+    public ResponseEntity<?> createPost(@RequestPart("info") PostRequestDTO postRequestDTO,
+                                        @RequestPart("files") MultipartFile[] files,
                                         HttpServletRequest request){
         return ResponseEntity.ok(postService.createPost(
                 jwtTokenUtil.getUserDetails(JwtTokenUtil.getAccessToken(request)),
-                postRequestDTO
+                postRequestDTO,
+                files
         ));
     }
 

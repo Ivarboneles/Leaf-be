@@ -3,14 +3,24 @@ package com.example.leaf.controller.customer;
 import com.example.leaf.dto.request.ChatRequestDTO;
 import com.example.leaf.dto.request.CommentRequestDTO;
 import com.example.leaf.dto.request.ReactionRequestDTO;
+import com.example.leaf.services.CommentService;
+import com.example.leaf.utils.JwtTokenUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.UUID;
 
 @RestController
 @RequestMapping(value = "/api/v1/comment")
 public class CommentController {
+
+    @Autowired
+    CommentService commentService;
+
+    @Autowired
+    JwtTokenUtil jwtTokenUtil;
 
     @GetMapping(value = "/post/{id}")
     public ResponseEntity<?> getAllCommentByPost(@PathVariable(name = "id") UUID id){
@@ -23,18 +33,23 @@ public class CommentController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createComment(@RequestBody CommentRequestDTO commentRequestDTO){
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> createComment(@RequestBody CommentRequestDTO commentRequestDTO,
+                                           HttpServletRequest request){
+        return ResponseEntity.ok(commentService.createComment(
+                jwtTokenUtil.getUserDetails(JwtTokenUtil.getAccessToken(request)),
+                commentRequestDTO
+        ));
     }
 
-    @PutMapping
-    public ResponseEntity<?> updateComment(@RequestBody CommentRequestDTO commentRequestDTO){
-        return ResponseEntity.ok().build();
+    @PutMapping(value = "/{id}")
+    public ResponseEntity<?> updateComment(@PathVariable("id") String id ,
+                                           @RequestBody String content){
+        return ResponseEntity.ok(commentService.updateComment(id,content));
     }
 
     @DeleteMapping(value = "/{id}")
-    public ResponseEntity<?> deleteComment(@PathVariable(name= "id") UUID id){
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> deleteComment(@PathVariable(name= "id") String id){
+        return ResponseEntity.ok(commentService.hideComment(id));
     }
 
 

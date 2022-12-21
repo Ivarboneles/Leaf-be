@@ -8,7 +8,7 @@ import com.example.leaf.entities.User;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface PostService {
-    DataResponse<?> createPost(User user, PostRequestDTO postRequestDTO);
+    DataResponse<?> createPost(User user, PostRequestDTO postRequestDTO, MultipartFile[] files);
 
     DataResponse<?> uploadFilePost(String postId, MultipartFile[] files);
 
@@ -16,5 +16,5 @@ public interface PostService {
 
     DataResponse<?> deletePost(String id);
 
-    ListResponse<?> getListPostOfUser(String user);
+    ListResponse<?> getListPostOfUser(User user);
 }

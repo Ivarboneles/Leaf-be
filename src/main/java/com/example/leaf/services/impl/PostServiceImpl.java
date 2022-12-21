@@ -23,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
+import java.util.Date;
 
 @Service
 @Transactional
@@ -42,13 +43,33 @@ public class PostServiceImpl implements PostService {
     @Autowired
     ImageService imageService;
     @Override
-    public DataResponse<?> createPost(User user, PostRequestDTO postRequestDTO) {
-        Post post = mapper.map(postRequestDTO, Post.class);
-        post.setId(serviceUtils.GenerateID());
-        post.setUser(user);
-        post.setStatus(StatusEnum.ENABLE.toString());
-        post.setComments(new ArrayList<>());
-        post.setFiles(new ArrayList<>());
+    public DataResponse<?> createPost(User user, PostRequestDTO postRequestDTO, MultipartFile[] files) {
+        Post post = new Post();
+        try{
+            post.setValue(postRequestDTO.getValue());
+            post.setId(serviceUtils.GenerateID());
+            post.setCreateDate(new Date());
+            post.setUser(user);
+            post.setStatus(StatusEnum.ENABLE.toString());
+            post.setComments(new ArrayList<>());
+            post.setFiles(new ArrayList<>());
+            postRepository.save(post);
+            for(MultipartFile file : files){
+                String fileName = imageService.save(file);
+
+                String imageUrl = imageService.getImageUrl(fileName);
+
+                File newFile = new File();
+                newFile.setId(serviceUtils.GenerateID());
+                newFile.setPost(post);
+                newFile.setValue(imageUrl);
+                newFile.setType(1);
+                newFile.setStatus(StatusEnum.ENABLE.toString());
+                post.getFiles().add(fileRepository.save(newFile));
+            }
+        }catch (Exception e){
+            throw new InvalidValueException("Can't upload file : " + e.getMessage());
+        }
         return serviceUtils.convertToDataResponse(postRepository.save(post), PostResponseDTO.class);
     }
 
@@ -103,10 +124,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public ListResponse<?> getListPostOfUser(String username) {
-        User user = userRepository.findUserByUsername(username).orElseThrow(
-                () -> new ResourceNotFoundException("User " + username + " not found")
-        );
+    public ListResponse<?> getListPostOfUser(User user) {
 
         return serviceUtils.convertToListResponse(
                 postRepository.findAllByUserAndStatus(user, StatusEnum.ENABLE.toString()),
