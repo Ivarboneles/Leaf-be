@@ -12,7 +12,7 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CommentRequestDTO {
-    @NotNull
+
     private String postId;
     @NotNull
     private String content;

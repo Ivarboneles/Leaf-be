@@ -25,6 +25,7 @@ import net.bytebuddy.utility.RandomString;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -265,7 +266,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ListResponse<?> getListPost(User user) {
-        return serviceUtils.convertToListResponse(postRepository.findAllByUserAndStatus(user, StatusEnum.ENABLE.toString()), PostOfUserResponseDTO.class);
+        return serviceUtils.convertToListResponse(postRepository.findAllByUserAndStatus(user, StatusEnum.ENABLE.toString(), Sort.by("createDate").descending()), PostOfUserResponseDTO.class);
     }
 
     private void encodePassword(User user) {

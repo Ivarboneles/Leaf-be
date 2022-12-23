@@ -62,4 +62,20 @@ public class CommentServiceImpl implements CommentService {
         comment.setStatus(StatusEnum.DISABLE.toString());
         return serviceUtils.convertToDataResponse(commentRepository.save(comment), CommentResponseDTO.class);
     }
+
+    @Override
+    public DataResponse<?> replyComment(String commentId, User user, String content) {
+        Comment newComment = new Comment();
+        Comment fatherComment = commentRepository.findById(commentId).orElseThrow(
+                () -> new ResourceNotFoundException("can't find comment " + commentId) );
+        newComment.setComment(fatherComment);
+        newComment.setId(serviceUtils.GenerateID());
+        newComment.setStatus(StatusEnum.ENABLE.toString());
+        newComment.setValue(content);
+        newComment.setType(1);
+        newComment.setCreateDate(new Date());
+        newComment.setUser(user);
+        newComment.setPost(fatherComment.getPost());
+        return serviceUtils.convertToDataResponse(commentRepository.save(newComment) , CommentResponseDTO.class);
+    }
 }

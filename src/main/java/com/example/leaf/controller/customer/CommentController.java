@@ -52,11 +52,15 @@ public class CommentController {
         return ResponseEntity.ok(commentService.hideComment(id));
     }
 
-
     @PostMapping(value = "/rep/{id}")
-    public ResponseEntity<?> replyComment( @PathVariable(name = "id") UUID id,
-                                        @RequestBody CommentRequestDTO commentRequestDTO){
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> replyComment( @PathVariable(name = "id") String id,
+                                            @RequestBody CommentRequestDTO commentRequestDTO,
+                                           HttpServletRequest request){
+        return ResponseEntity.ok(commentService.replyComment(
+                id,
+                jwtTokenUtil.getUserDetails(JwtTokenUtil.getAccessToken(request)),
+                commentRequestDTO.getContent()
+        ));
     }
 
     @PostMapping(value = "/reaction/{id}")

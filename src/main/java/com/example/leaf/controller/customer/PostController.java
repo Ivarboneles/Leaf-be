@@ -32,10 +32,15 @@ public class PostController {
     JwtTokenUtil jwtTokenUtil;
 
     @GetMapping(value = "/user")
-    public ResponseEntity<?> getAllPostByUser(HttpServletRequest request){
+    public ResponseEntity<?> getAllPostOfCurrentUser(HttpServletRequest request){
         return ResponseEntity.ok(postService.getListPostOfUser(
                 jwtTokenUtil.getUserDetails(JwtTokenUtil.getAccessToken(request))
         ));
+    }
+
+    @GetMapping(value = "/user/{username}")
+    public ResponseEntity<?> getAllPostByUser( @PathVariable("username") String username){
+        return ResponseEntity.ok(postService.getListPostOfUserName(username));
     }
 
     @GetMapping(value = "/{id}")
@@ -46,7 +51,7 @@ public class PostController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(encoding = @Encoding(name = "postRequestDTO", contentType = "application/json")))
     public ResponseEntity<?> createPost(@RequestPart("info") PostRequestDTO postRequestDTO,
-                                        @RequestPart("files") MultipartFile[] files,
+                                        @RequestPart(value = "files", required = false) MultipartFile[] files,
                                         HttpServletRequest request){
         return ResponseEntity.ok(postService.createPost(
                 jwtTokenUtil.getUserDetails(JwtTokenUtil.getAccessToken(request)),
@@ -72,15 +77,22 @@ public class PostController {
         return ResponseEntity.ok(postService.deletePost(id));
     }
 
+    @GetMapping(value = "/{id}/hidden")
+    public ResponseEntity<?> hiddenPost(@PathVariable(name= "id") String id){
+        return ResponseEntity.ok(postService.hiddenPost(id));
+    }
 
     @PostMapping(value = "/share/{id}")
-    public ResponseEntity<?> sharePost( @PathVariable(name = "id") UUID id,
-                                           @RequestBody PostRequestDTO postRequestDTO){
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> sharePost( @PathVariable(name = "id") String id,
+                                        HttpServletRequest request){
+        return ResponseEntity.ok(postService.sharePost(
+                id,
+                jwtTokenUtil.getUserDetails(JwtTokenUtil.getAccessToken(request))
+        ));
     }
 
     @PostMapping(value = "/reaction/{id}")
-    public ResponseEntity<?> reactionPost( @PathVariable(name = "id") UUID id,
+    public ResponseEntity<?> reactionPost( @PathVariable(name = "id") String id,
                                               @RequestBody ReactionRequestDTO reactionRequestDTO){
         return ResponseEntity.ok().build();
     }

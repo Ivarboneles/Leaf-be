@@ -10,4 +10,6 @@ public interface CommentService {
     DataResponse<?> updateComment(String id, String content);
 
     DataResponse<?> hideComment(String id);
+
+    DataResponse<?> replyComment(String commentId, User user, String content);
 }
