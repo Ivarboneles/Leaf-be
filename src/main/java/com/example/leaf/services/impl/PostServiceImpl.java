@@ -18,6 +18,7 @@ import com.example.leaf.services.PostService;
 import com.example.leaf.utils.ServiceUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Service
 @Transactional
@@ -53,19 +55,20 @@ public class PostServiceImpl implements PostService {
         post.setStatus(StatusEnum.ENABLE.toString());
         post.setComments(new ArrayList<>());
         post.setFiles(new ArrayList<>());
+        post.setReactions(new ArrayList<>());
         postRepository.save(post);
         if(files != null) {
-            uploadFile(files, post);
+            uploadFile(files, post, postRequestDTO.getType());
         }
         return serviceUtils.convertToDataResponse(postRepository.save(post), PostResponseDTO.class);
     }
 
     @Override
-    public DataResponse<?> uploadFilePost(String postId, MultipartFile[] files) {
+    public DataResponse<?> uploadFilePost(String postId, MultipartFile[] files, Integer[] types) {
         Post post = postRepository.findById(postId).orElseThrow(
                 () -> new ResourceNotFoundException("Can't found post")
         );
-        uploadFile(files, post);
+        uploadFile(files, post,types );
         return serviceUtils.convertToDataResponse(post, PostResponseDTO.class);
     }
 
@@ -106,9 +109,29 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public ListResponse<?> getListPostOfUser(User user) {
+        List<Post> list =postRepository.findAllByUserAndStatus(user, StatusEnum.ENABLE.toString(),Sort.by("createDate").descending());
 
         return serviceUtils.convertToListResponse(
-                postRepository.findAllByUserAndStatus(user, StatusEnum.ENABLE.toString(),Sort.by("createDate").descending()),
+                list,
+                PostResponseDTO.class
+        );
+    }
+
+    @Override
+    public ListResponse<?> getAllPostOfUser(User user) {
+        List<Post> list = postRepository.findAllByUser(user, Sort.by("createDate").descending());
+
+        return serviceUtils.convertToListResponse(
+                list,
+                PostResponseDTO.class
+        );
+    }
+
+    @Override
+    public ListResponse<?> getNewFeedPost(Integer page) {
+        List<Post> list = postRepository.findAllByStatus(StatusEnum.ENABLE.toString(),PageRequest.of(page-1, 15).withSort(Sort.by("createDate").descending())).getContent();
+        return serviceUtils.convertToListResponse(
+                list,
                 PostResponseDTO.class
         );
     }
@@ -141,17 +164,22 @@ public class PostServiceImpl implements PostService {
     }
 
 
-    void uploadFile(MultipartFile[] files, Post post){
+    void uploadFile(MultipartFile[] files, Post post, Integer[] type){
         try{
-            for(MultipartFile file : files){
-                String fileName = imageService.save(file);
+            for(int i = 0; i < files.length ; i ++){
+                String fileName = imageService.save(files[i]);
 
                 String imageUrl = imageService.getImageUrl(fileName);
                 File newFile = new File();
                 newFile.setId(serviceUtils.GenerateID());
                 newFile.setPost(post);
                 newFile.setValue(imageUrl);
-                newFile.setType(1);
+
+                if(type != null) {
+                    newFile.setType(type[i]);
+                }else {
+                    newFile.setType(1);
+                }
                 newFile.setStatus(StatusEnum.ENABLE.toString());
                 post.getFiles().add(fileRepository.save(newFile));
             }

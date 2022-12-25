@@ -10,15 +10,18 @@ import org.springframework.web.multipart.MultipartFile;
 public interface PostService {
     DataResponse<?> createPost(User user, PostRequestDTO postRequestDTO, MultipartFile[] files);
 
-    DataResponse<?> uploadFilePost(String postId, MultipartFile[] files);
+    DataResponse<?> uploadFilePost(String postId, MultipartFile[] files, Integer[] types);
 
     DataResponse<?> updatePost(String id, PostRequestDTO postRequestDTO);
 
     DataResponse<?> deletePost(String id);
     DataResponse<?> hiddenPost(String id);
 
-
     ListResponse<?> getListPostOfUser(User user);
+
+    ListResponse<?> getAllPostOfUser(User user);
+
+    ListResponse<?> getNewFeedPost(Integer page);
 
     ListResponse<?> getListPostOfUserName(String username);
 

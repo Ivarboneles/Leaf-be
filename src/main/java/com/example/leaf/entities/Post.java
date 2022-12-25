@@ -47,4 +47,7 @@ public class Post {
 
     @OneToMany(mappedBy = "post")
     private List<File> files;
+
+    @OneToMany(mappedBy = "post")
+    private List<ReactionPost> reactions;
 }

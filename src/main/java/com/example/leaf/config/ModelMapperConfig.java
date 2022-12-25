@@ -1,7 +1,7 @@
 package com.example.leaf.config;
 
-import com.example.leaf.dto.response.UserResponseDTO;
-import com.example.leaf.entities.User;
+import com.example.leaf.dto.response.*;
+import com.example.leaf.entities.*;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
@@ -19,6 +19,22 @@ public class ModelMapperConfig {
         modelMapper.getConfiguration()
                 .setMatchingStrategy(MatchingStrategies.STRICT);
 
+        var listCommentOfPost = generateListConverter(Comment.class, CommentOfPostResponseDTO.class, modelMapper);
+        var listFileOfPost = generateListConverter(File.class, FileOfPostResponseDTO.class, modelMapper);
+        var listReactionOfPost = generateListConverter(ReactionPost.class, ReactionPostResponseDTO.class, modelMapper);
+
+
+        modelMapper.createTypeMap(Post.class, PostResponseDTO.class).addMappings(m -> {
+            m.using(listCommentOfPost).map(Post::getComments, PostResponseDTO::setComments);
+            m.using(listFileOfPost).map(Post::getFiles, PostResponseDTO::setFiles);
+            m.using(listReactionOfPost).map(Post::getReactions, PostResponseDTO::setReactions);
+            m.map(Post::getId, PostResponseDTO::setId);
+            m.map(Post::getUser, PostResponseDTO::setUser);
+            m.map(Post::getPost, PostResponseDTO::setPost);
+            m.map(Post::getCreateDate, PostResponseDTO::setCreateDate);
+            m.map(Post::getValue, PostResponseDTO::setValue);
+            m.map(Post::getStatus, PostResponseDTO::setStatus);
+        });
 
         return modelMapper;
     }

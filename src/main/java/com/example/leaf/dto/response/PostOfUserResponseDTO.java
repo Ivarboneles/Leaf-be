@@ -17,4 +17,5 @@ public class PostOfUserResponseDTO {
     private String value;
     private List<CommentOfPostResponseDTO> comments;
     private List<FileOfPostResponseDTO> files;
+    private List<ReactionPostResponseDTO> reactions;
 }

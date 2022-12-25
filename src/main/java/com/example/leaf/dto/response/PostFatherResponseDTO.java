@@ -15,6 +15,5 @@ public class PostFatherResponseDTO {
     private SearchUserResponseDTO user;
     private Date createDate;
     private String value;
-    private List<CommentOfPostResponseDTO> comments;
     private List<FileOfPostResponseDTO> files;
 }

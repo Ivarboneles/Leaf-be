@@ -32,9 +32,24 @@ public class PostController {
     JwtTokenUtil jwtTokenUtil;
 
     @GetMapping(value = "/user")
-    public ResponseEntity<?> getAllPostOfCurrentUser(HttpServletRequest request){
+    public ResponseEntity<?> getListPostOfCurrentUser(HttpServletRequest request){
         return ResponseEntity.ok(postService.getListPostOfUser(
                 jwtTokenUtil.getUserDetails(JwtTokenUtil.getAccessToken(request))
+        ));
+    }
+
+    @GetMapping(value = "/all/user")
+    public ResponseEntity<?> getAllPostOfCurrentUser(HttpServletRequest request){
+        return ResponseEntity.ok(postService.getAllPostOfUser(
+                jwtTokenUtil.getUserDetails(JwtTokenUtil.getAccessToken(request))
+        ));
+    }
+
+    @GetMapping(value = "/new-feed/{page}")
+    public ResponseEntity<?> getNewFeedPost( @PathVariable("page") Integer page,
+                                             HttpServletRequest request){
+        return ResponseEntity.ok(postService.getNewFeedPost(
+              page
         ));
     }
 
@@ -62,8 +77,9 @@ public class PostController {
 
     @PostMapping(value = "/{id}/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> uploadFilePost(@PathVariable("id") String id,
+                                            @RequestPart("type") Integer[] type,
                                             @RequestPart MultipartFile[] files){
-        return ResponseEntity.ok(postService.uploadFilePost(id, files));
+        return ResponseEntity.ok(postService.uploadFilePost(id, files, type));
     }
 
     @PutMapping(value = "/update/{id}")

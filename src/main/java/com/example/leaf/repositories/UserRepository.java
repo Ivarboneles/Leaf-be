@@ -16,6 +16,6 @@ public interface UserRepository extends JpaRepository<User, String> {
 
     Optional<User> findUserByUsername(String username);
 
-    @Query(nativeQuery = true, value ="SELECT * FROM user WHERE name like '%' :name '%'")
+    @Query(nativeQuery = true, value ="SELECT * FROM user WHERE name like '%' :name '%' and role = 'CUSTOMER'")
     List<User> searchByName(@Param("name") String text);
 }
