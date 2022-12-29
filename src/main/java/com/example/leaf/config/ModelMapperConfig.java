@@ -36,6 +36,15 @@ public class ModelMapperConfig {
             m.map(Post::getStatus, PostResponseDTO::setStatus);
         });
 
+        modelMapper.createTypeMap(Comment.class, CommentFatherResponseDTO.class).addMappings( m -> {
+            m.map(Comment::getId, CommentFatherResponseDTO::setId);
+            m.map(Comment::getUser, CommentFatherResponseDTO::setUser);
+            m.map(Comment::getValue, CommentFatherResponseDTO::setValue);
+            m.map(Comment::getCreateDate, CommentFatherResponseDTO::setCreateDate);
+            m.map(Comment::getType, CommentFatherResponseDTO::setType);
+            m.map(Comment::getStatus, CommentFatherResponseDTO::setStatus);
+        });
+
         return modelMapper;
     }
 

@@ -12,6 +12,7 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 public class CommentFatherResponseDTO {
+    private String id;
     private SearchUserResponseDTO user;
     private String value;
     private Integer type;
