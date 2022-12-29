@@ -1,20 +1,15 @@
 package com.example.leaf.dto.request;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
 
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
 @Setter
-public class NotifyRequestDTO {
+@NoArgsConstructor
+public class ListNotifyRequestDTO {
     @NotNull
-    private String content;
-
-    @NotNull
-    private String username;
+    private String[] ids;
 }

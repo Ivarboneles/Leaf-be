@@ -32,7 +32,6 @@ public class Notify {
     @CreationTimestamp
     private Date createDate;
 
-
     @NotNull(message = "value is required")
     private String value;
 

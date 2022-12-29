@@ -20,19 +20,53 @@ public class RelationshipController {
 
     @Autowired
     JwtTokenUtil jwtTokenUtil;
-    @GetMapping(value = "/user")
+    @GetMapping(value = "/all/{username}")
     public ResponseEntity<?> getAllRelationShipByUser(@PathVariable(name = "username") String username){
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(
+                relationShipService.getAllRelationShipByUsername(username)
+        );
     }
 
-    @GetMapping
-    public ResponseEntity<?> getRelationShipById(@RequestParam(name = "userFrom") String userFrom,
-                                                 @RequestParam(name = "userTo") String userTo){
-        return ResponseEntity.ok().build();
+    @GetMapping(value = "/user")
+    public ResponseEntity<?> getAllRelationShipByCurrentUser(HttpServletRequest request){
+        return ResponseEntity.ok(
+                relationShipService.getAllRelationShipByUser(jwtTokenUtil.getUserDetails(
+                        JwtTokenUtil.getAccessToken(request)
+                ))
+        );
     }
 
-    @PostMapping
-    public ResponseEntity<?> createRelationShip(@RequestBody String username, HttpServletRequest request){
+    @GetMapping(value = "/invitation")
+    public ResponseEntity<?> getAllInvitationFriend(HttpServletRequest request){
+        return ResponseEntity.ok(
+                relationShipService.getAllInvitationFriend(jwtTokenUtil.getUserDetails(
+                        JwtTokenUtil.getAccessToken(request)
+                ))
+        );
+    }
+
+    @GetMapping(value = "/friend")
+    public ResponseEntity<?> getAllFriend(HttpServletRequest request){
+        return ResponseEntity.ok(
+                relationShipService.getAllFriend(jwtTokenUtil.getUserDetails(
+                        JwtTokenUtil.getAccessToken(request)
+                ))
+        );
+    }
+
+    @GetMapping(value = "/{username}")
+    public ResponseEntity<?> getRelationShipByUsername(@PathVariable(name = "username") String username,
+                                                       HttpServletRequest request){
+        return ResponseEntity.ok(
+                relationShipService.getRelationShipById(
+                        jwtTokenUtil.getUserDetails(JwtTokenUtil.getAccessToken(request)),
+                        username
+                )
+        );
+    }
+
+    @PostMapping(value = "/{username}")
+    public ResponseEntity<?> createRelationShip(@PathVariable("username") String username, HttpServletRequest request){
         return ResponseEntity.ok(relationShipService.createRelationShip(jwtTokenUtil.getUserDetails(JwtTokenUtil.getAccessToken(request)), username));
     }
 
@@ -50,4 +84,6 @@ public class RelationshipController {
                 friend
         ));
     }
+
+
 }

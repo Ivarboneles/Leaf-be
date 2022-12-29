@@ -9,4 +9,5 @@ import java.util.List;
 
 public interface RelationShipRepository extends JpaRepository<RelationShip, RelationShipKey> {
     List<RelationShip> findAllByUserFromOrUserTo(User userFrom, User userTo);
+    List<RelationShip> findAllByUserToAndStatus(User userTo, String status);
 }
