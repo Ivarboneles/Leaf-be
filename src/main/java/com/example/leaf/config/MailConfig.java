@@ -11,10 +11,11 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 public class MailConfig {
     @Bean
     public JavaMailSender getJavaMailSender() {
+        //Config mail sender
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
         mailSender.setHost("smtp.gmail.com");
         mailSender.setPort(587);
-
+        //Email account
         mailSender.setUsername("kietnguyen04012001@gmail.com");
         mailSender.setPassword("phtgcrrzwnwrfjyl");
 

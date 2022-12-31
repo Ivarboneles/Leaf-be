@@ -110,7 +110,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public DataResponse<?> updateUser(User user, UserUpdateRequestDTO userUpdateRequestDTO) {
-
+        //check phone
         if(userUpdateRequestDTO.getPhone() != null){
             if(!user.getPhone().equals(userUpdateRequestDTO.getPhone())){
                 Optional<User> userOptional = userRepository.findUserByPhone(userUpdateRequestDTO.getPhone());
@@ -120,33 +120,33 @@ public class UserServiceImpl implements UserService {
                 user.setPhone(userUpdateRequestDTO.getPhone());
             }
         }
-
+        //check name
         if (userUpdateRequestDTO.getName() != null){
             if(!user.getName().equals(userUpdateRequestDTO.getName())){
                 user.setName(userUpdateRequestDTO.getName());
             }
         }
-
+        //check birthday
         if(userUpdateRequestDTO.getBirthday() != null){
             if(user.getBirthday() != userUpdateRequestDTO.getBirthday()){
                 user.setBirthday(userUpdateRequestDTO.getBirthday());
             }
         }
-
+        //check bio
         if(userUpdateRequestDTO.getBio() != null){
             user.setBio(userUpdateRequestDTO.getBio());
         }
-
+        //check gender
        if(userUpdateRequestDTO.getGender() != null){
            if(!user.getGender().equals(userUpdateRequestDTO.getGender())){
                user.setGender(userUpdateRequestDTO.getGender());
            }
        }
-
+        //check nickname
        if(userUpdateRequestDTO.getNickname() != null){
            user.setNickname(userUpdateRequestDTO.getNickname());
        }
-
+        //new token
        String token = jwtTokenUtil.generateToken(user);
 
        return new DataResponse<>( new LoginResponseDTO<>(token, mapper.map( userRepository.save(user), UserResponseDTO.class )));
@@ -160,7 +160,7 @@ public class UserServiceImpl implements UserService {
         String oldPassword = changePasswordRequestDTO.getOldPassword();
         String newPassword = changePasswordRequestDTO.getNewPassword();
         String verification = changePasswordRequestDTO.getVerificationCode();
-
+        //check verify
         if(userExists.getVerificationCode().equals(verification)) {
             if(userExists.getPassword().equals(oldPassword)){
                 userExists.setPassword(newPassword);

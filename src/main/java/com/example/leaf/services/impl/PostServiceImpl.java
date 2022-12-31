@@ -47,6 +47,7 @@ public class PostServiceImpl implements PostService {
     ImageService imageService;
     @Override
     public DataResponse<?> createPost(User user, PostRequestDTO postRequestDTO, MultipartFile[] files) {
+        //Create new post
         Post post = new Post();
         post.setValue(postRequestDTO.getValue());
         post.setId(serviceUtils.GenerateID());
@@ -58,6 +59,7 @@ public class PostServiceImpl implements PostService {
         post.setReactions(new ArrayList<>());
         postRepository.save(post);
         if(files != null) {
+            //upload post's file
             uploadFile(files, post, postRequestDTO.getType());
         }
         return serviceUtils.convertToDataResponse(postRepository.save(post), PostResponseDTO.class);
@@ -102,7 +104,7 @@ public class PostServiceImpl implements PostService {
         Post post = postRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("Can't find post")
         );
-
+        //set status -> Disable
         post.setStatus(StatusEnum.DISABLE.toString());
         return serviceUtils.convertToDataResponse(postRepository.save(post), PostResponseDTO.class);
     }
@@ -166,21 +168,25 @@ public class PostServiceImpl implements PostService {
 
     void uploadFile(MultipartFile[] files, Post post, Integer[] type){
         try{
+            //read file in files
             for(int i = 0; i < files.length ; i ++){
+                //Upload file
                 String fileName = imageService.save(files[i]);
-
                 String imageUrl = imageService.getImageUrl(fileName);
+
+                //Create file in db
                 File newFile = new File();
                 newFile.setId(serviceUtils.GenerateID());
                 newFile.setPost(post);
                 newFile.setValue(imageUrl);
-
+                //read type of file
                 if(type != null) {
                     newFile.setType(type[i]);
                 }else {
                     newFile.setType(1);
                 }
                 newFile.setStatus(StatusEnum.ENABLE.toString());
+                //Add file to files of post
                 post.getFiles().add(fileRepository.save(newFile));
             }
         }catch (Exception e){

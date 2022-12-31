@@ -12,7 +12,7 @@ public class SpringDocConfig {
     @Bean
     public OpenAPI configOpenAPI() {
         final String securitySchemeName = "bearerAuth";
-
+        //Config swagger
         return new OpenAPI()
                 .info(new Info().title("Leaf backend API")
                         .version("v1.0"))

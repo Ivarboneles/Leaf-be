@@ -81,9 +81,11 @@ public class RelationShipServiceImpl implements RelationShipService {
     @Override
     public DataResponse<?> getRelationShipById(User user, String username) {
         Optional<RelationShip> relationShip =  relationShipRepository.findById(new RelationShipKey(user.getUsername(), username));
+        //check relationship user1 ->  user 2
         if(relationShip.isPresent()){
            return serviceUtils.convertToDataResponse(relationShip.get(), RelationShipResponseDTO.class);
         }
+        //check relationship user2 ->  user 1
         relationShip =  relationShipRepository.findById(new RelationShipKey(username, user.getUsername()));
         if(relationShip.isPresent()){
             return serviceUtils.convertToDataResponse(relationShip.get(), RelationShipResponseDTO.class);
@@ -109,9 +111,11 @@ public class RelationShipServiceImpl implements RelationShipService {
                 .orElseThrow(() -> new ResourceNotFoundException("Not found user " + usernameTo));
         Optional<RelationShip> relationShipOptional = relationShipRepository.findById(new RelationShipKey(userFrom.getUsername(), usernameTo));
         RelationShip relationShip = new RelationShip();
+        //check relationship user1 ->  user 2
         if(relationShipOptional.isPresent()){
             relationShip = relationShipOptional.get();
         }else {
+            //check relationship user1 ->  user 2
             relationShipOptional = relationShipRepository.findById(new RelationShipKey(usernameTo,userFrom.getUsername()));
             if(relationShipOptional.isPresent()){
                 relationShip = relationShipOptional.get();
@@ -128,7 +132,9 @@ public class RelationShipServiceImpl implements RelationShipService {
         User userTo = userRepository.findUserByUsername(friend)
                 .orElseThrow(() -> new ResourceNotFoundException("Not found user " + friend));
         try{
+            //check relationship user1 ->  user 2
             relationShipRepository.deleteById(new RelationShipKey(user.getUsername(), friend));
+            //check relationship user1 ->  user 2
             relationShipRepository.deleteById(new RelationShipKey(friend, user.getUsername()));
         }catch (Exception e){
             throw new InvalidValueException("Can't delete relationship!");

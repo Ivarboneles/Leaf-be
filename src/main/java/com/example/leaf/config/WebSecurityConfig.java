@@ -47,6 +47,7 @@ public class WebSecurityConfig {
 
     @Bean
     UserDetailsService userDetailsService() {
+        //Find user by user name or phone or email
         return new UserDetailsService() {
             @Override
             public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -78,9 +79,10 @@ public class WebSecurityConfig {
 
     @Bean
     SecurityFilterChain configure(HttpSecurity http) throws Exception {
+        //Config Spring Security
         http.cors().and().csrf().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-
+        //Authorize api
         http
                 .authorizeRequests()
                 .antMatchers("/api/v1/login/**",

@@ -32,6 +32,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public DataResponse<?> createComment(User user, CommentRequestDTO commentRequestDTO) {
+        //Create new Comment
         Comment comment = new Comment();
         comment.setId(serviceUtils.GenerateID());
         comment.setCreateDate(new Date());
@@ -39,6 +40,7 @@ public class CommentServiceImpl implements CommentService {
         comment.setUser(user);
         comment.setType(1);
         comment.setValue(commentRequestDTO.getContent());
+        //find Post
         comment.setPost(postRepository.findById(commentRequestDTO.getPostId()).orElseThrow(
                 () -> new ResourceNotFoundException("Can't find post")
         ));
@@ -47,25 +49,31 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public DataResponse<?> updateComment(String id, String content) {
+        //Check comment
         Comment comment = commentRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("can't find comment")
         );
+        //Change content comment
         comment.setValue(content);
         return serviceUtils.convertToDataResponse(commentRepository.save(comment), CommentResponseDTO.class);
     }
 
     @Override
     public DataResponse<?> hideComment(String id) {
+        //Check comment
         Comment comment = commentRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("can't find comment")
         );
+        //Change status comment
         comment.setStatus(StatusEnum.DISABLE.toString());
         return serviceUtils.convertToDataResponse(commentRepository.save(comment), CommentResponseDTO.class);
     }
 
     @Override
     public DataResponse<?> replyComment(String commentId, User user, String content) {
+        //Create new comment
         Comment newComment = new Comment();
+        //Set father comment
         Comment fatherComment = commentRepository.findById(commentId).orElseThrow(
                 () -> new ResourceNotFoundException("can't find comment " + commentId) );
         newComment.setComment(fatherComment);

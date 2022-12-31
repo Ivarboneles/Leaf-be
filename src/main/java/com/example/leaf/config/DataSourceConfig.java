@@ -14,6 +14,7 @@ import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 public class DataSourceConfig {
     @Bean
     public DataSourceInitializer dataSourceInitializer(@Qualifier("dataSource") final DataSource dataSource) {
+        //Get default data
         ResourceDatabasePopulator resourceDatabasePopulator = new ResourceDatabasePopulator();
         resourceDatabasePopulator.setContinueOnError(true);
         resourceDatabasePopulator.addScript(new ClassPathResource("/data.sql"));

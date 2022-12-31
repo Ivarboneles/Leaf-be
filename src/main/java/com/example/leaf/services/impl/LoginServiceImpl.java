@@ -42,16 +42,17 @@ public class LoginServiceImpl implements LoginService {
 
     @Override
     public DataResponse<?> authenticateWithUsernamePassword(String username, String password, RoleEnum requestedRole) throws LoginException {
+        //check user
         Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
         SecurityContextHolder.getContext().setAuthentication(auth);
 
         @SuppressWarnings("rawtypes")
         User user = (User) auth.getPrincipal();
-        System.out.println(user.getUsername());
+        //create token
         String token = generateToken(user.getUsername());
 
         String r = user.getRole().getName();
-
+        //check role
         if (requestedRole.equals(RoleEnum.CUSTOMER) && requestedRole.toString().equals(r)) { // buyer
             return new DataResponse<>(new LoginResponseDTO<>(
                     token,

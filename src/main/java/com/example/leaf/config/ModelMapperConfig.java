@@ -18,12 +18,12 @@ public class ModelMapperConfig {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration()
                 .setMatchingStrategy(MatchingStrategies.STRICT);
-
+        //Mapper list
         var listCommentOfPost = generateListConverter(Comment.class, CommentOfPostResponseDTO.class, modelMapper);
         var listFileOfPost = generateListConverter(File.class, FileOfPostResponseDTO.class, modelMapper);
         var listReactionOfPost = generateListConverter(ReactionPost.class, ReactionPostResponseDTO.class, modelMapper);
 
-
+        //Mapper Post -> PostResponseDTO
         modelMapper.createTypeMap(Post.class, PostResponseDTO.class).addMappings(m -> {
             m.using(listCommentOfPost).map(Post::getComments, PostResponseDTO::setComments);
             m.using(listFileOfPost).map(Post::getFiles, PostResponseDTO::setFiles);
@@ -35,7 +35,7 @@ public class ModelMapperConfig {
             m.map(Post::getValue, PostResponseDTO::setValue);
             m.map(Post::getStatus, PostResponseDTO::setStatus);
         });
-
+        //Mapper Comment -> CommentFatherResponseDTO
         modelMapper.createTypeMap(Comment.class, CommentFatherResponseDTO.class).addMappings( m -> {
             m.map(Comment::getId, CommentFatherResponseDTO::setId);
             m.map(Comment::getUser, CommentFatherResponseDTO::setUser);
