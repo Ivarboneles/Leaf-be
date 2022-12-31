@@ -129,6 +129,7 @@ public class RelationShipServiceImpl implements RelationShipService {
                 .orElseThrow(() -> new ResourceNotFoundException("Not found user " + friend));
         try{
             relationShipRepository.deleteById(new RelationShipKey(user.getUsername(), friend));
+            relationShipRepository.deleteById(new RelationShipKey(friend, user.getUsername()));
         }catch (Exception e){
             throw new InvalidValueException("Can't delete relationship!");
         }
