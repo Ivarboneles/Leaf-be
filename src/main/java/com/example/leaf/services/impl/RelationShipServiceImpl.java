@@ -107,11 +107,18 @@ public class RelationShipServiceImpl implements RelationShipService {
     public DataResponse<?> updateRelationShip(User userFrom, String usernameTo, String status) {
         User userTo = userRepository.findUserByUsername(usernameTo)
                 .orElseThrow(() -> new ResourceNotFoundException("Not found user " + usernameTo));
-        RelationShip relationShip = relationShipRepository.
-                findById(new RelationShipKey(userFrom.getUsername(), usernameTo)).
-                orElseThrow(() ->
-                        new ResourceNotFoundException("Can't found relationship of user "+
-                                userFrom.getUsername() + " and user " + usernameTo));
+        Optional<RelationShip> relationShipOptional = relationShipRepository.findById(new RelationShipKey(userFrom.getUsername(), usernameTo));
+        RelationShip relationShip = new RelationShip();
+        if(relationShipOptional.isPresent()){
+            relationShip = relationShipOptional.get();
+        }else {
+            relationShipOptional = relationShipRepository.findById(new RelationShipKey(usernameTo,userFrom.getUsername()));
+            if(relationShipOptional.isPresent()){
+                relationShip = relationShipOptional.get();
+            }else {
+                throw new ResourceNotFoundException("Can't find relationship");
+            }
+        }
         relationShip.setStatus(status);
         return serviceUtils.convertToDataResponse(relationShipRepository.save(relationShip), RelationShipResponseDTO.class) ;
     }
