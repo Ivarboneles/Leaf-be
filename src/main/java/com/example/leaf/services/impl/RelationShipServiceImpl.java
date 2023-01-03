@@ -68,7 +68,7 @@ public class RelationShipServiceImpl implements RelationShipService {
         List<RelationShip> list = relationShipRepository.findAllByUserFromOrUserTo(user,user);
         List<RelationShip> result = new ArrayList<>();
         for(RelationShip relationShip: list){
-            if(relationShip.getStatus().equals( RelationEnum.FOLLOW.toString())){
+            if(relationShip.getStatus().equals( RelationEnum.FRIEND.toString())){
                 result.add(relationShip);
             }
         }
@@ -131,14 +131,18 @@ public class RelationShipServiceImpl implements RelationShipService {
     public DataResponse<?> deleteRelationShip(User user, String friend) {
         User userTo = userRepository.findUserByUsername(friend)
                 .orElseThrow(() -> new ResourceNotFoundException("Not found user " + friend));
-        try{
-            //check relationship user1 ->  user 2
-            relationShipRepository.deleteById(new RelationShipKey(user.getUsername(), friend));
-            //check relationship user1 ->  user 2
-            relationShipRepository.deleteById(new RelationShipKey(friend, user.getUsername()));
-        }catch (Exception e){
-            throw new InvalidValueException("Can't delete relationship!");
+        Optional<RelationShip> relationShip=relationShipRepository.findById(new RelationShipKey(user.getUsername(), friend));
+        if(relationShip.isPresent()){
+            relationShipRepository.delete(relationShip.get());
+        }else{
+            relationShip=relationShipRepository.findById(new RelationShipKey(friend, user.getUsername()));
+            if(relationShip.isPresent()){
+                relationShipRepository.delete(relationShip.get());
+            }else{
+                throw new InvalidValueException("Can't delete relationship!");
+            }
         }
+
         DataResponse dataResponse = new DataResponse<>();
         dataResponse.setMessage("Delete Relationship successful!");
         return dataResponse;
