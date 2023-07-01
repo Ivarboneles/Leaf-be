@@ -37,6 +37,7 @@ import javax.mail.internet.MimeMessage;
 import javax.transaction.Transactional;
 import java.io.UnsupportedEncodingException;
 import java.util.Optional;
+import java.util.Random;
 
 
 @Service
@@ -103,7 +104,7 @@ public class UserServiceImpl implements UserService {
         user.setGender(GenderEnum.MALE.toString());
         user.setAvatar("https://storage.googleapis.com/leaf-5c2c4.appspot.com/39f94986-d898-49dd-b9eb-5ff979857ab9png");
 
-        String randomCodeVerify = RandomString.make(64);
+        String randomCodeVerify = generateVerifyCode();
         user.setVerificationCode(randomCodeVerify);
         return serviceUtils.convertToDataResponse(userRepository.save(user), UserResponseDTO.class);
     }
@@ -189,6 +190,7 @@ public class UserServiceImpl implements UserService {
         User getUser = userRepository.findUserByVerificationCode(verifyCode)
                 .orElseThrow(() -> new ResourceNotFoundException("Verify code is incorrect"));
         getUser.setEnable(true);
+        getUser.setVerificationCode(generateVerifyCode());
 
         return serviceUtils.convertToDataResponse(userRepository.save(getUser), UserResponseDTO.class);
     }
@@ -269,6 +271,15 @@ public class UserServiceImpl implements UserService {
         return serviceUtils.convertToListResponse(postRepository.findAllByUserAndStatus(user, StatusEnum.ENABLE.toString(), Sort.by("createDate").descending()), PostOfUserResponseDTO.class);
     }
 
+    private String generateVerifyCode(){
+        Random random = new Random();
+        int number1 = 100 + random.nextInt(999);
+        int number2 = 100 + random.nextInt(999);
+        int number3 = 100 + random.nextInt(999);
+
+        return number1 + "-" + number2 + "-" + number3;
+    }
+
     private void encodePassword(User user) {
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
@@ -278,10 +289,10 @@ public class UserServiceImpl implements UserService {
             throws MessagingException, UnsupportedEncodingException {
         String subject = "Please verify your registration";
         String senderName = "Leaf App";
-        String verifyUrl = siteUrl + "/verify?code=" + user.getVerificationCode();
+//        String verifyUrl = siteUrl + "/verify?code=" + user.getVerificationCode();
         String mailContent = "<p>Dear " + user.getName() + ",<p><br>"
-                + "Please click the link below to verify your registration:<br>"
-                + "<h3><a href = \"" + verifyUrl + "\">VERIFY</a></h3>"
+                + "We send to verify code of your registration email:<br>"
+                + "<h3> Verify code: \"" + user.getVerificationCode() + "\"</h3>"
                 + "Thank you,<br>" + "Leaf App";
 
         MimeMessage message = mailSender.createMimeMessage();

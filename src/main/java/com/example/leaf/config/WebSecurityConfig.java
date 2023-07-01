@@ -86,7 +86,7 @@ public class WebSecurityConfig {
         http
                 .authorizeRequests()
                 .antMatchers("/api/v1/login/**",
-                         "/api/v1/forgot-password", "/api/v1/user/create").permitAll()
+                         "/api/v1/forgot-password", "/api/v1/user/create", "/api/v1/user/verify", "/api/v1/user/send-verify").permitAll()
                 .and()
                 .authorizeRequests()
                 .antMatchers("/api/v1/admin/**").hasRole("ADMIN")
