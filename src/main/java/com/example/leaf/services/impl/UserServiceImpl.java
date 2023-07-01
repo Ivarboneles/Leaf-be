@@ -1,9 +1,6 @@
 package com.example.leaf.services.impl;
 
-import com.example.leaf.dto.request.ChangePasswordRequestDTO;
-import com.example.leaf.dto.request.ForgotPasswordRequestDTO;
-import com.example.leaf.dto.request.RegisterUserRequestDTO;
-import com.example.leaf.dto.request.UserUpdateRequestDTO;
+import com.example.leaf.dto.request.*;
 import com.example.leaf.dto.response.*;
 import com.example.leaf.entities.User;
 import com.example.leaf.entities.enums.GenderEnum;
@@ -186,8 +183,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public DataResponse<?> verifyUser(String verifyCode) {
-        User getUser = userRepository.findUserByVerificationCode(verifyCode)
+    public DataResponse<?> verifyUser(VerifyRequestDTO verifyRequestDTO) {
+        User getUser = userRepository.findUserByVerificationCodeAndEmail(verifyRequestDTO.getCode(), verifyRequestDTO.getEmail())
                 .orElseThrow(() -> new ResourceNotFoundException("Verify code is incorrect"));
         getUser.setEnable(true);
         getUser.setVerificationCode(generateVerifyCode());

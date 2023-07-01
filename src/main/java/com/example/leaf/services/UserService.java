@@ -1,9 +1,6 @@
 package com.example.leaf.services;
 
-import com.example.leaf.dto.request.ChangePasswordRequestDTO;
-import com.example.leaf.dto.request.ForgotPasswordRequestDTO;
-import com.example.leaf.dto.request.RegisterUserRequestDTO;
-import com.example.leaf.dto.request.UserUpdateRequestDTO;
+import com.example.leaf.dto.request.*;
 import com.example.leaf.dto.response.DataResponse;
 import com.example.leaf.dto.response.ListResponse;
 import com.example.leaf.entities.User;
@@ -14,7 +11,7 @@ public interface UserService {
     DataResponse<?> updateUser(User user, UserUpdateRequestDTO userUpdateRequestDTO);
     DataResponse<?> changePassword(String username, ChangePasswordRequestDTO changePasswordRequestDTO);
     DataResponse<?> getUserById(String username);
-    DataResponse<?> verifyUser(String verifyCode);
+    DataResponse<?> verifyUser(VerifyRequestDTO verifyRequestDTO);
 
     DataResponse<?> sendVerifyCode(String email);
 

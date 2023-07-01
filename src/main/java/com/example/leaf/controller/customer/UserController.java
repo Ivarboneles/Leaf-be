@@ -52,8 +52,8 @@ public class UserController {
     }
 
     @PostMapping(value = "/verify")
-    public ResponseEntity<?> verify(@RequestBody String code){
-        return ResponseEntity.ok(userService.verifyUser(code));
+    public ResponseEntity<?> verify(@RequestBody VerifyRequestDTO verifyRequestDTO){
+        return ResponseEntity.ok(userService.verifyUser(verifyRequestDTO));
     }
 
     @PutMapping(value = "/change-email")
