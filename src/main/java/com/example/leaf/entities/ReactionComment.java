@@ -23,17 +23,17 @@ public class ReactionComment {
 
     @Id
     @ManyToOne(optional = false)
-    @JoinColumn(name = "reaction")
-    private Reaction reaction;
-
-    @Id
-    @ManyToOne(optional = false)
     @JoinColumn(name = "comment")
     private Comment comment;
 
+    @Id
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user", referencedColumnName = "username")
     private User user;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "reaction")
+    private Reaction reaction;
 
     @NotNull(message = "Create date is required")
     @CreationTimestamp

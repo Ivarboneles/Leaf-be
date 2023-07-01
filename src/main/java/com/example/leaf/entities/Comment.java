@@ -11,6 +11,7 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -48,4 +49,7 @@ public class Comment {
 
     @NotNull(message = "Status is required")
     private String status;
+
+    @OneToMany(mappedBy = "comment")
+    private List<ReactionComment> reactions;
 }

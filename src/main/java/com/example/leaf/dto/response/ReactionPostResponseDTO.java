@@ -19,7 +19,7 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 public class ReactionPostResponseDTO {
-
+    private PostOfReactionResponseDTO post;
     private Reaction reaction;
     private SearchUserResponseDTO user;
     private Date createDate;

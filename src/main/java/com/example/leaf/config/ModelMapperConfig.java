@@ -21,7 +21,8 @@ public class ModelMapperConfig {
         //Mapper list
         var listCommentOfPost = generateListConverter(Comment.class, CommentOfPostResponseDTO.class, modelMapper);
         var listFileOfPost = generateListConverter(File.class, FileOfPostResponseDTO.class, modelMapper);
-        var listReactionOfPost = generateListConverter(ReactionPost.class, ReactionPostResponseDTO.class, modelMapper);
+        var listReactionOfPost = generateListConverter(ReactionPost.class, ReactionOfPostResponseDTO.class, modelMapper);
+        var listReactionOfComment = generateListConverter(ReactionComment.class, ReactionOfCommentResponseDTO.class, modelMapper);
 
         //Mapper Post -> PostResponseDTO
         modelMapper.createTypeMap(Post.class, PostResponseDTO.class).addMappings(m -> {
@@ -34,6 +35,29 @@ public class ModelMapperConfig {
             m.map(Post::getCreateDate, PostResponseDTO::setCreateDate);
             m.map(Post::getValue, PostResponseDTO::setValue);
             m.map(Post::getStatus, PostResponseDTO::setStatus);
+        });
+        //Mapper Comment -> CommentResponseDTO
+        modelMapper.createTypeMap(Comment.class, CommentResponseDTO.class).addMappings(m -> {
+            m.using(listReactionOfComment).map(Comment::getReactions, CommentResponseDTO::setReactions);
+            m.map(Comment::getId, CommentResponseDTO::setId);
+            m.map(Comment::getUser, CommentResponseDTO::setUser);
+            m.map(Comment::getPost, CommentResponseDTO::setPost);
+            m.map(Comment::getCreateDate, CommentResponseDTO::setCreateDate);
+            m.map(Comment::getType, CommentResponseDTO::setType);
+            m.map(Comment::getValue, CommentResponseDTO::setValue);
+            m.map(Comment::getStatus, CommentResponseDTO::setStatus);
+            m.map(Comment::getComment, CommentResponseDTO::setComment);
+        });
+        //Mapper Comment -> CommentOfPostResponseDTO
+        modelMapper.createTypeMap(Comment.class, CommentOfPostResponseDTO.class).addMappings(m -> {
+            m.using(listReactionOfComment).map(Comment::getReactions, CommentOfPostResponseDTO::setReactions);
+            m.map(Comment::getId, CommentOfPostResponseDTO::setId);
+            m.map(Comment::getUser, CommentOfPostResponseDTO::setUser);
+            m.map(Comment::getCreateDate, CommentOfPostResponseDTO::setCreateDate);
+            m.map(Comment::getValue, CommentOfPostResponseDTO::setValue);
+            m.map(Comment::getType, CommentOfPostResponseDTO::setType);
+            m.map(Comment::getStatus, CommentOfPostResponseDTO::setStatus);
+            m.map(Comment::getComment, CommentOfPostResponseDTO::setComment);
         });
         //Mapper Comment -> CommentFatherResponseDTO
         modelMapper.createTypeMap(Comment.class, CommentFatherResponseDTO.class).addMappings( m -> {

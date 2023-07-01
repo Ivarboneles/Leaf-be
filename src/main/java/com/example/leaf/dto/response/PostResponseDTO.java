@@ -20,5 +20,5 @@ public class PostResponseDTO {
     private String status;
     private List<CommentOfPostResponseDTO> comments;
     private List<FileOfPostResponseDTO> files;
-    private List<ReactionPostResponseDTO> reactions;
+    private List<ReactionOfPostResponseDTO> reactions;
 }

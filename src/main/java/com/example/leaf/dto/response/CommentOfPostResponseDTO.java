@@ -11,6 +11,7 @@ import lombok.Setter;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -23,4 +24,5 @@ public class CommentOfPostResponseDTO {
     private Integer type;
     private Date createDate;
     private String status;
+    private List<ReactionOfCommentResponseDTO> reactions;
 }

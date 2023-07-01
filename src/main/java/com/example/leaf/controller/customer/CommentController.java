@@ -67,12 +67,19 @@ public class CommentController {
     public ResponseEntity<?> reactionComment(   @PathVariable(name = "id") String id,
                                                 @RequestBody ReactionRequestDTO reactionRequestDTO,
                                                 HttpServletRequest request){
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(commentService.reactionComment(
+                id,
+                reactionRequestDTO,
+                jwtTokenUtil.getUserDetails(JwtTokenUtil.getAccessToken(request))
+        ));
     }
 
     @PostMapping(value = "/un-reaction/{id}")
     public ResponseEntity<?> unReactionComment( @PathVariable(name = "id") String id,
                                                 HttpServletRequest request){
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(commentService.unReactionComment(
+                id,
+                jwtTokenUtil.getUserDetails(JwtTokenUtil.getAccessToken(request))
+        ));
     }
 }

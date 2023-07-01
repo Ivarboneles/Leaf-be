@@ -15,7 +15,7 @@ import java.util.UUID;
 public class ReactionCommentKey implements Serializable {
 
     private String comment;
-    private String reaction;
+    private String user;
 
     @Override
     public int hashCode() {

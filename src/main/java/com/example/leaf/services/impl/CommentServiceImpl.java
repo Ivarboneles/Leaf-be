@@ -1,14 +1,20 @@
 package com.example.leaf.services.impl;
 
 import com.example.leaf.dto.request.CommentRequestDTO;
+import com.example.leaf.dto.request.ReactionRequestDTO;
 import com.example.leaf.dto.response.CommentResponseDTO;
 import com.example.leaf.dto.response.DataResponse;
-import com.example.leaf.entities.Comment;
-import com.example.leaf.entities.User;
+import com.example.leaf.dto.response.ReactionCommentResponseDTO;
+import com.example.leaf.dto.response.ReactionPostResponseDTO;
+import com.example.leaf.entities.*;
 import com.example.leaf.entities.enums.StatusEnum;
+import com.example.leaf.entities.keys.ReactionCommentKey;
+import com.example.leaf.entities.keys.ReactionPostKey;
 import com.example.leaf.exceptions.ResourceNotFoundException;
 import com.example.leaf.repositories.CommentRepository;
 import com.example.leaf.repositories.PostRepository;
+import com.example.leaf.repositories.ReactionCommentRepository;
+import com.example.leaf.repositories.ReactionRepository;
 import com.example.leaf.services.CommentService;
 import com.example.leaf.utils.ServiceUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.Date;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -23,6 +30,12 @@ public class CommentServiceImpl implements CommentService {
 
     @Autowired
     CommentRepository commentRepository;
+
+    @Autowired
+    ReactionRepository reactionRepository;
+
+    @Autowired
+    ReactionCommentRepository reactionCommentRepository;
 
     @Autowired
     PostRepository postRepository;
@@ -85,5 +98,45 @@ public class CommentServiceImpl implements CommentService {
         newComment.setUser(user);
         newComment.setPost(fatherComment.getPost());
         return serviceUtils.convertToDataResponse(commentRepository.save(newComment) , CommentResponseDTO.class);
+    }
+
+    @Override
+    public DataResponse<?> reactionComment(String commentId, ReactionRequestDTO reactionRequestDTO, User user) {
+        Optional<ReactionComment> reactionCommentOptional = reactionCommentRepository.findById(new ReactionCommentKey(commentId, user.getUsername()));
+        ReactionComment reactionComment = new ReactionComment();
+
+        if(reactionCommentOptional.isPresent()) {
+            reactionComment = reactionCommentOptional.get();
+        } else {
+            Comment comment = commentRepository.findById(commentId).orElseThrow(
+                    () -> new ResourceNotFoundException("can't found comment " + commentId)
+            );
+            reactionComment.setComment(comment);
+            reactionComment.setUser(user);
+            reactionComment.setCreateDate( new Date());
+        }
+
+        Reaction reaction = reactionRepository.findById(reactionRequestDTO.getName()).orElseThrow(
+                () -> new ResourceNotFoundException("can't found reaction " + reactionRequestDTO.getName())
+        );
+
+        reactionComment.setReaction(reaction);
+        reactionComment.setStatus(StatusEnum.ENABLE.toString());
+
+        return serviceUtils.convertToDataResponse(reactionCommentRepository.save(reactionComment), ReactionCommentResponseDTO.class);
+    }
+
+    @Override
+    public DataResponse<?> unReactionComment(String commentId, User user) {
+        System.out.println("CommentID : " + commentId);
+        System.out.println("User : " + user.getUsername());
+        ReactionComment reactionComment = reactionCommentRepository.findById(
+                new ReactionCommentKey(commentId, user.getUsername())
+        ).orElseThrow(
+                () -> new ResourceNotFoundException("can't found reaction of comment " + commentId)
+        );
+
+        reactionComment.setStatus(StatusEnum.DISABLE.toString());
+        return serviceUtils.convertToDataResponse(reactionCommentRepository.save(reactionComment), ReactionCommentResponseDTO.class);
     }
 }
