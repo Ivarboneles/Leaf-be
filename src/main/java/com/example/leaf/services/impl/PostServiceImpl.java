@@ -1,18 +1,17 @@
 package com.example.leaf.services.impl;
 
 import com.example.leaf.dto.request.PostRequestDTO;
+import com.example.leaf.dto.request.ReactionRequestDTO;
 import com.example.leaf.dto.response.DataResponse;
 import com.example.leaf.dto.response.ListResponse;
 import com.example.leaf.dto.response.PostResponseDTO;
-import com.example.leaf.entities.File;
-import com.example.leaf.entities.Post;
-import com.example.leaf.entities.User;
+import com.example.leaf.dto.response.ReactionPostResponseDTO;
+import com.example.leaf.entities.*;
 import com.example.leaf.entities.enums.StatusEnum;
+import com.example.leaf.entities.keys.ReactionPostKey;
 import com.example.leaf.exceptions.InvalidValueException;
 import com.example.leaf.exceptions.ResourceNotFoundException;
-import com.example.leaf.repositories.FileRepository;
-import com.example.leaf.repositories.PostRepository;
-import com.example.leaf.repositories.UserRepository;
+import com.example.leaf.repositories.*;
 import com.example.leaf.services.ImageService;
 import com.example.leaf.services.PostService;
 import com.example.leaf.utils.ServiceUtils;
@@ -27,6 +26,7 @@ import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -35,9 +35,12 @@ public class PostServiceImpl implements PostService {
     PostRepository postRepository;
     @Autowired
     ServiceUtils serviceUtils;
-
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    ReactionRepository reactionRepository;
+    @Autowired
+    ReactionPostRepository reactionPostRepository;
     @Autowired
     FileRepository fileRepository;
     @Autowired
@@ -163,6 +166,44 @@ public class PostServiceImpl implements PostService {
         newPost.setFiles(new ArrayList<>());
         newPost.setComments(new ArrayList<>());
         return serviceUtils.convertToDataResponse(postRepository.save(newPost), PostResponseDTO.class);
+    }
+
+    @Override
+    public DataResponse<?> reactionPost(String postId, ReactionRequestDTO reactionRequestDTO, User user) {
+        Optional<ReactionPost> reactionPostOptional = reactionPostRepository.findById(new ReactionPostKey(postId, user.getUsername()));
+        ReactionPost reactionPost = new ReactionPost();
+
+        if(reactionPostOptional.isPresent()) {
+            reactionPost = reactionPostOptional.get();
+        } else {
+            Post post = postRepository.findById(postId).orElseThrow(
+                    () -> new ResourceNotFoundException("can't found post " + postId)
+            );
+            reactionPost.setPost(post);
+            reactionPost.setUser(user);
+            reactionPost.setCreateDate( new Date());
+        }
+
+        Reaction reaction = reactionRepository.findById(reactionRequestDTO.getName()).orElseThrow(
+                () -> new ResourceNotFoundException("can't found reaction " + reactionRequestDTO.getName())
+        );
+
+        reactionPost.setReaction(reaction);
+        reactionPost.setStatus(StatusEnum.ENABLE.toString());
+
+        return serviceUtils.convertToDataResponse(reactionPostRepository.save(reactionPost), ReactionPostResponseDTO.class);
+    }
+
+    @Override
+    public DataResponse<?> unReactionPost(String postId, User user) {
+        ReactionPost reactionPost = reactionPostRepository.findById(
+                new ReactionPostKey(postId, user.getUsername())
+        ).orElseThrow(
+                () -> new ResourceNotFoundException("can't found reaction of post " + postId)
+        );
+
+        reactionPost.setStatus(StatusEnum.DISABLE.toString());
+        return serviceUtils.convertToDataResponse(reactionPostRepository.save(reactionPost), ReactionPostResponseDTO.class);
     }
 
 

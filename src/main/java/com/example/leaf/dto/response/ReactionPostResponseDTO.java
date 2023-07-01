@@ -21,8 +21,7 @@ import java.util.Date;
 public class ReactionPostResponseDTO {
 
     private Reaction reaction;
-    private Post post;
-    private User user;
+    private SearchUserResponseDTO user;
     private Date createDate;
     private String status;
 }

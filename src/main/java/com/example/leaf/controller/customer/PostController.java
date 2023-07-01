@@ -109,14 +109,21 @@ public class PostController {
 
     @PostMapping(value = "/reaction/{id}")
     public ResponseEntity<?> reactionPost( @PathVariable(name = "id") String id,
-                                              @RequestBody ReactionRequestDTO reactionRequestDTO){
-        return ResponseEntity.ok().build();
+                                           @RequestBody ReactionRequestDTO reactionRequestDTO,
+                                           HttpServletRequest request){
+        return ResponseEntity.ok(postService.reactionPost(
+                id,
+                reactionRequestDTO,
+                jwtTokenUtil.getUserDetails(JwtTokenUtil.getAccessToken(request))
+        ));
     }
 
     @PostMapping(value = "/un-reaction/{id}")
-    public ResponseEntity<?> unReactionPost( @PathVariable(name = "id") UUID id,
-                                                @RequestBody ReactionRequestDTO reactionRequestDTO){
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> unReactionPost( @PathVariable(name = "id") String id,
+                                             HttpServletRequest request){
+        return ResponseEntity.ok(postService.unReactionPost(
+                id,
+                jwtTokenUtil.getUserDetails(JwtTokenUtil.getAccessToken(request))
+        ));
     }
-
 }

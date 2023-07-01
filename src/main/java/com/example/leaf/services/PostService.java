@@ -1,6 +1,7 @@
 package com.example.leaf.services;
 
 import com.example.leaf.dto.request.PostRequestDTO;
+import com.example.leaf.dto.request.ReactionRequestDTO;
 import com.example.leaf.dto.response.DataResponse;
 import com.example.leaf.dto.response.ListResponse;
 import com.example.leaf.entities.Post;
@@ -26,4 +27,8 @@ public interface PostService {
     ListResponse<?> getListPostOfUserName(String username);
 
     DataResponse<?> sharePost(String postId, User user);
+
+    DataResponse<?> reactionPost(String postId, ReactionRequestDTO reactionRequestDTO, User user);
+
+    DataResponse<?> unReactionPost(String postId, User user);
 }

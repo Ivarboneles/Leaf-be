@@ -64,14 +64,15 @@ public class CommentController {
     }
 
     @PostMapping(value = "/reaction/{id}")
-    public ResponseEntity<?> reactionComment( @PathVariable(name = "id") UUID id,
-                                           @RequestBody ReactionRequestDTO reactionRequestDTO){
+    public ResponseEntity<?> reactionComment(   @PathVariable(name = "id") String id,
+                                                @RequestBody ReactionRequestDTO reactionRequestDTO,
+                                                HttpServletRequest request){
         return ResponseEntity.ok().build();
     }
 
     @PostMapping(value = "/un-reaction/{id}")
-    public ResponseEntity<?> unReactionComment( @PathVariable(name = "id") UUID id,
-                                             @RequestBody ReactionRequestDTO reactionRequestDTO){
+    public ResponseEntity<?> unReactionComment( @PathVariable(name = "id") String id,
+                                                HttpServletRequest request){
         return ResponseEntity.ok().build();
     }
 }

@@ -16,7 +16,7 @@ import lombok.Setter;
 public class ReactionPostKey implements Serializable{
 
     private String post;
-    private String reaction;
+    private String user;
 
     @Override
     public int hashCode() {
