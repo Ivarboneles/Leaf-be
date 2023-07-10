@@ -2,10 +2,7 @@ package com.example.leaf.services.impl;
 
 import com.example.leaf.dto.request.PostRequestDTO;
 import com.example.leaf.dto.request.ReactionRequestDTO;
-import com.example.leaf.dto.response.DataResponse;
-import com.example.leaf.dto.response.ListResponse;
-import com.example.leaf.dto.response.PostResponseDTO;
-import com.example.leaf.dto.response.ReactionPostResponseDTO;
+import com.example.leaf.dto.response.*;
 import com.example.leaf.entities.*;
 import com.example.leaf.entities.enums.StatusEnum;
 import com.example.leaf.entities.keys.ReactionPostKey;
@@ -15,6 +12,7 @@ import com.example.leaf.repositories.*;
 import com.example.leaf.services.ImageService;
 import com.example.leaf.services.PostService;
 import com.example.leaf.utils.ServiceUtils;
+import org.apache.mahout.cf.taste.common.TasteException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -39,6 +37,9 @@ public class PostServiceImpl implements PostService {
     UserRepository userRepository;
     @Autowired
     ReactionRepository reactionRepository;
+
+    @Autowired
+    CommentRepository commentRepository;
     @Autowired
     ReactionPostRepository reactionPostRepository;
     @Autowired
@@ -56,10 +57,11 @@ public class PostServiceImpl implements PostService {
         post.setId(serviceUtils.GenerateID());
         post.setCreateDate(new Date());
         post.setUser(user);
+        if(postRequestDTO.getSecurity() != null){
+            post.setSecurity(postRequestDTO.getSecurity());
+        }
         post.setStatus(StatusEnum.ENABLE.toString());
-        post.setComments(new ArrayList<>());
         post.setFiles(new ArrayList<>());
-        post.setReactions(new ArrayList<>());
         postRepository.save(post);
         if(files != null) {
             //upload post's file
@@ -113,43 +115,66 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public ListResponse<?> getListPostOfUser(User user) {
-        List<Post> list =postRepository.findAllByUserAndStatus(user, StatusEnum.ENABLE.toString(),Sort.by("createDate").descending());
-
-        return serviceUtils.convertToListResponse(
-                list,
-                PostResponseDTO.class
+    public DataResponse<?> changeSecurityPost(String postId, String security, User user) {
+        Post post = postRepository.findById(postId).orElseThrow(
+                () -> new ResourceNotFoundException("Can't find post")
         );
+
+        if(post.getUser() != user){
+            throw  new ResourceNotFoundException("User " + user.getUsername() + " no have this post !!!");
+        }
+
+        post.setSecurity(security);
+
+        return serviceUtils.convertToDataResponse(postRepository.save(post), PostResponseDTO.class);
+    }
+
+    @Override
+    public ListResponse<?> getListPostOfUser(User user) {
+//        try {
+//            serviceUtils.recomendUser(user.getUsername());
+//        } catch (TasteException e) {
+//            throw new RuntimeException(e);
+//        }
+        List<Post> list = postRepository.findAllByUserAndStatus(user, StatusEnum.ENABLE.toString(),Sort.by("createDate").descending());
+
+        return countCommentReactionPost(list, user);
     }
 
     @Override
     public ListResponse<?> getAllPostOfUser(User user) {
         List<Post> list = postRepository.findAllByUser(user, Sort.by("createDate").descending());
 
-        return serviceUtils.convertToListResponse(
-                list,
-                PostResponseDTO.class
-        );
+        return countCommentReactionPost(list, user);
     }
 
     @Override
-    public ListResponse<?> getNewFeedPost(Integer page) {
+    public ListResponse<?> getNewFeedPost(Integer page, User user) {
         List<Post> list = postRepository.findAllByStatus(StatusEnum.ENABLE.toString(),PageRequest.of(page-1, 15).withSort(Sort.by("createDate").descending())).getContent();
-        return serviceUtils.convertToListResponse(
-                list,
-                PostResponseDTO.class
-        );
+        return countCommentReactionPost(list, user);
     }
 
     @Override
-    public ListResponse<?> getListPostOfUserName(String username) {
-        User user = userRepository.findUserByUsername(username).orElseThrow(
+    public ListResponse<?> getListPostOfUserName(String username, User user) {
+        User userFriend = userRepository.findUserByUsername(username).orElseThrow(
                 () -> new ResourceNotFoundException("Can't found user " + username)
         );
-        return serviceUtils.convertToListResponse(
-                postRepository.findAllByUserAndStatus(user, StatusEnum.ENABLE.toString(), Sort.by("createDate").descending()),
-                PostResponseDTO.class
-        );
+        List<Post> list = postRepository.findAllByUserAndStatus(userFriend, StatusEnum.ENABLE.toString(), Sort.by("createDate").descending());
+        return countCommentReactionPost(list, user);
+    }
+
+    @Override
+    public ListResponse<?> getListReactionByPostAndPageSize(String postId, Integer size) {
+
+        Post post = postRepository.findById(postId).orElseThrow(
+                () -> new ResourceNotFoundException("Can't find post"));
+
+        List<ReactionPost> reactionPostList = reactionPostRepository.findAllByPostAndStatus(
+                post,
+                StatusEnum.ENABLE.toString(),
+                PageRequest.of(size-1, 10).withSort(Sort.by("createDate").descending())
+        ).getContent();
+        return serviceUtils.convertToListResponse(reactionPostList, ReactionOfPostResponseDTO.class);
     }
 
     @Override
@@ -164,7 +189,6 @@ public class PostServiceImpl implements PostService {
                 () -> new ResourceNotFoundException("can't found post " + postId)
         ));
         newPost.setFiles(new ArrayList<>());
-        newPost.setComments(new ArrayList<>());
         return serviceUtils.convertToDataResponse(postRepository.save(newPost), PostResponseDTO.class);
     }
 
@@ -233,6 +257,33 @@ public class PostServiceImpl implements PostService {
         }catch (Exception e){
             throw new InvalidValueException("Can't upload file : " + e.getMessage());
         }
+    }
+
+    ListResponse<?> countCommentReactionPost(List<Post> list, User user){
+        List<PostResponseDTO> listDTO = new ArrayList<>();
+        for(Post item : list){
+            PostResponseDTO postDTO = serviceUtils.convertToResponseDTO(item, PostResponseDTO.class);
+            List<ReactionPost> reactionPostList = reactionPostRepository.findAllByPostAndStatus(item, StatusEnum.ENABLE.toString());
+            List<Comment> commentPostList = commentRepository.findAllByPostAndStatus(item, StatusEnum.ENABLE.toString(), Sort.by("createDate").descending());
+            Optional<ReactionPost> optionalReactionPost = reactionPostRepository.findById(new ReactionPostKey(
+                    item.getId(),
+                    user.getUsername()
+            ));
+            if(optionalReactionPost.isPresent()){
+                postDTO.setLikedPost(true);
+            }else {
+                postDTO.setLikedPost(false);
+            }
+            postDTO.setCountReaction(reactionPostList.size());
+            postDTO.setCountComment(commentPostList.size());
+            List<CommentOfPostResponseDTO> commentOfPostResponseDTOList = new ArrayList<>();
+            for(int i = 0; i < commentPostList.size() && i < 3; i++){
+                commentOfPostResponseDTOList.add(serviceUtils.convertToResponseDTO(commentPostList.get(i), CommentOfPostResponseDTO.class));
+            }
+            postDTO.setComments(commentOfPostResponseDTOList);
+            listDTO.add(postDTO);
+        }
+        return new ListResponse<>(listDTO);
     }
 }
 

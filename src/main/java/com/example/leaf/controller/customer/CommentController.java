@@ -22,9 +22,12 @@ public class CommentController {
     @Autowired
     JwtTokenUtil jwtTokenUtil;
 
-    @GetMapping(value = "/post/{id}")
-    public ResponseEntity<?> getAllCommentByPost(@PathVariable(name = "id") UUID id){
-        return ResponseEntity.ok().build();
+    @GetMapping(value = "/post/{id}/{size}")
+    public ResponseEntity<?> getAllCommentByPost(@PathVariable(name = "id") String id,
+                                                 @PathVariable(name = "size") Integer size){
+        return ResponseEntity.ok(
+                commentService.getAllCommentByPostAndPageSize(id, size)
+        );
     }
 
     @GetMapping(value = "/{id}")

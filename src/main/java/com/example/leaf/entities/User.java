@@ -73,6 +73,9 @@ public class User implements UserDetails {
     @NotNull(message = "Enable is required")
     private Boolean enable;
 
+    @NotNull(message = "Security is required")
+    private String security = "PUBLIC";
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<SimpleGrantedAuthority> authorities =new ArrayList<>();

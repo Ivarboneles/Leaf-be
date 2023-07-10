@@ -17,14 +17,16 @@ public interface PostService {
 
     DataResponse<?> deletePost(String id);
     DataResponse<?> hiddenPost(String id);
-
+    DataResponse<?> changeSecurityPost(String postId, String security, User user);
     ListResponse<?> getListPostOfUser(User user);
 
     ListResponse<?> getAllPostOfUser(User user);
 
-    ListResponse<?> getNewFeedPost(Integer page);
+    ListResponse<?> getNewFeedPost(Integer page, User user);
 
-    ListResponse<?> getListPostOfUserName(String username);
+    ListResponse<?> getListPostOfUserName(String username, User user);
+
+    ListResponse<?> getListReactionByPostAndPageSize(String postId, Integer size);
 
     DataResponse<?> sharePost(String postId, User user);
 

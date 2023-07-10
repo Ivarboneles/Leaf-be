@@ -49,13 +49,18 @@ public class PostController {
     public ResponseEntity<?> getNewFeedPost( @PathVariable("page") Integer page,
                                              HttpServletRequest request){
         return ResponseEntity.ok(postService.getNewFeedPost(
-              page
+                page,
+                jwtTokenUtil.getUserDetails(JwtTokenUtil.getAccessToken(request))
         ));
     }
 
     @GetMapping(value = "/user/{username}")
-    public ResponseEntity<?> getAllPostByUser( @PathVariable("username") String username){
-        return ResponseEntity.ok(postService.getListPostOfUserName(username));
+    public ResponseEntity<?> getAllPostByUser( @PathVariable("username") String username,
+                                               HttpServletRequest request){
+        return ResponseEntity.ok(postService.getListPostOfUserName(
+                username,
+                jwtTokenUtil.getUserDetails(JwtTokenUtil.getAccessToken(request))
+        ));
     }
 
     @GetMapping(value = "/{id}")
@@ -72,6 +77,15 @@ public class PostController {
                 jwtTokenUtil.getUserDetails(JwtTokenUtil.getAccessToken(request)),
                 postRequestDTO,
                 files
+        ));
+    }
+
+    @GetMapping(value = "/{id}/{size}/list-reaction")
+    public ResponseEntity<?> getListReactionByPost( @PathVariable("id") String id,
+                                                    @PathVariable("size") Integer size){
+        return ResponseEntity.ok(postService.getListReactionByPostAndPageSize(
+                id,
+                size
         ));
     }
 
@@ -103,6 +117,17 @@ public class PostController {
                                         HttpServletRequest request){
         return ResponseEntity.ok(postService.sharePost(
                 id,
+                jwtTokenUtil.getUserDetails(JwtTokenUtil.getAccessToken(request))
+        ));
+    }
+
+    @PostMapping(value = "/change-security/{id}")
+    public ResponseEntity<?> changeSecurityPost( @PathVariable(name = "id") String id,
+                                                 @RequestBody String security,
+                                                 HttpServletRequest request){
+        return ResponseEntity.ok(postService.changeSecurityPost(
+                id,
+                security,
                 jwtTokenUtil.getUserDetails(JwtTokenUtil.getAccessToken(request))
         ));
     }

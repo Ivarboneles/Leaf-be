@@ -26,9 +26,7 @@ public class ModelMapperConfig {
 
         //Mapper Post -> PostResponseDTO
         modelMapper.createTypeMap(Post.class, PostResponseDTO.class).addMappings(m -> {
-            m.using(listCommentOfPost).map(Post::getComments, PostResponseDTO::setComments);
             m.using(listFileOfPost).map(Post::getFiles, PostResponseDTO::setFiles);
-            m.using(listReactionOfPost).map(Post::getReactions, PostResponseDTO::setReactions);
             m.map(Post::getId, PostResponseDTO::setId);
             m.map(Post::getUser, PostResponseDTO::setUser);
             m.map(Post::getPost, PostResponseDTO::setPost);

@@ -3,6 +3,8 @@ package com.example.leaf.services;
 import com.example.leaf.dto.request.CommentRequestDTO;
 import com.example.leaf.dto.request.ReactionRequestDTO;
 import com.example.leaf.dto.response.DataResponse;
+import com.example.leaf.dto.response.ListResponse;
+import com.example.leaf.entities.Post;
 import com.example.leaf.entities.User;
 
 public interface CommentService {
@@ -17,4 +19,6 @@ public interface CommentService {
     DataResponse<?> reactionComment(String commentId, ReactionRequestDTO reactionRequestDTO, User user);
 
     DataResponse<?> unReactionComment(String commentId, User user);
+
+    ListResponse<?> getAllCommentByPostAndPageSize(String postId, Integer size);
 }

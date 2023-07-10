@@ -2,10 +2,7 @@ package com.example.leaf.services.impl;
 
 import com.example.leaf.dto.request.CommentRequestDTO;
 import com.example.leaf.dto.request.ReactionRequestDTO;
-import com.example.leaf.dto.response.CommentResponseDTO;
-import com.example.leaf.dto.response.DataResponse;
-import com.example.leaf.dto.response.ReactionCommentResponseDTO;
-import com.example.leaf.dto.response.ReactionPostResponseDTO;
+import com.example.leaf.dto.response.*;
 import com.example.leaf.entities.*;
 import com.example.leaf.entities.enums.StatusEnum;
 import com.example.leaf.entities.keys.ReactionCommentKey;
@@ -18,10 +15,13 @@ import com.example.leaf.repositories.ReactionRepository;
 import com.example.leaf.services.CommentService;
 import com.example.leaf.utils.ServiceUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -138,5 +138,18 @@ public class CommentServiceImpl implements CommentService {
 
         reactionComment.setStatus(StatusEnum.DISABLE.toString());
         return serviceUtils.convertToDataResponse(reactionCommentRepository.save(reactionComment), ReactionCommentResponseDTO.class);
+    }
+
+    @Override
+    public ListResponse<?> getAllCommentByPostAndPageSize(String postId, Integer size) {
+        Post post = postRepository.findById(postId).orElseThrow(
+                () -> new ResourceNotFoundException("Can't find post"));
+
+        List<Comment> commentList = commentRepository.findAllByPostAndStatus(
+                post,
+                StatusEnum.ENABLE.toString(),
+                PageRequest.of(size-1, 10).withSort(Sort.by("createDate").descending())
+        ).getContent();
+        return serviceUtils.convertToListResponse(commentList, CommentOfPostResponseDTO.class);
     }
 }

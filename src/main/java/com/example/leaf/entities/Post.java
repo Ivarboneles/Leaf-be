@@ -36,18 +36,16 @@ public class Post {
     @NotNull(message = "Create date is required")
     @CreationTimestamp
     private Date createDate;
+
     @NotNull(message = "Value is required")
     private String value;
 
     @NotNull(message = "Status is required")
     private String status;
 
-    @OneToMany(mappedBy = "post")
-    private List<Comment> comments;
+    @NotNull(message = "Security is required")
+    private String security = "PUBLIC";
 
     @OneToMany(mappedBy = "post")
     private List<File> files;
-
-    @OneToMany(mappedBy = "post")
-    private List<ReactionPost> reactions;
 }

@@ -21,6 +21,6 @@ import java.util.List;
 public class PostRequestDTO {
     @NotNull(message = "Value is required")
     private String value;
-
+    private String security;
     private Integer[] type;
 }
