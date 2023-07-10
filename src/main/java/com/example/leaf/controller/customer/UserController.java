@@ -81,10 +81,21 @@ public class UserController {
         return ResponseEntity.ok(userService.searchUser(name));
     }
 
-    @GetMapping(value = "/list-friend")
-    public ResponseEntity<?> getListFriend(HttpServletRequest request){
-        return ResponseEntity.ok(userService.getListFriend(
-                jwtTokenUtil.getUserDetails(JwtTokenUtil.getAccessToken(request))
+    @GetMapping(value = "/search-friend/{name}")
+    public ResponseEntity<?> searchFriend(@PathVariable("name") String name,
+                                          HttpServletRequest request){
+        return ResponseEntity.ok(userService.searchFriend(
+                jwtTokenUtil.getUserDetails(JwtTokenUtil.getAccessToken(request)),
+                name
+        ));
+    }
+
+    @GetMapping(value = "/list-friend/{size}")
+    public ResponseEntity<?> getListFriend(@PathVariable(name = "size") Integer size,
+                                           HttpServletRequest request){
+        return ResponseEntity.ok(userService.getListFriendWithPage(
+                jwtTokenUtil.getUserDetails(JwtTokenUtil.getAccessToken(request)),
+                size
         ));
     }
 

@@ -23,7 +23,9 @@ public interface UserService {
 
     ListResponse<?> searchUser(String name);
 
-    ListResponse<?> getListFriend(User user);
+    ListResponse<?> searchFriend(User user, String name);
+
+    ListResponse<?> getListFriendWithPage(User user, Integer size);
 
     ListResponse<?> getListPost(User user);
 }

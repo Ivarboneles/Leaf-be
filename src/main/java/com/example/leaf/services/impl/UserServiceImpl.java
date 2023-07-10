@@ -3,10 +3,12 @@ package com.example.leaf.services.impl;
 import com.example.leaf.dto.request.*;
 import com.example.leaf.dto.response.*;
 import com.example.leaf.entities.ModelAI;
+import com.example.leaf.entities.RelationShip;
 import com.example.leaf.entities.User;
 import com.example.leaf.entities.enums.GenderEnum;
 import com.example.leaf.entities.enums.RoleEnum;
 import com.example.leaf.entities.enums.StatusEnum;
+import com.example.leaf.entities.keys.RelationShipKey;
 import com.example.leaf.exceptions.InvalidValueException;
 import com.example.leaf.exceptions.ResourceAlreadyExistsException;
 import com.example.leaf.exceptions.ResourceNotFoundException;
@@ -35,6 +37,7 @@ import org.apache.mahout.cf.taste.recommender.RecommendedItem;
 import org.apache.mahout.cf.taste.similarity.UserSimilarity;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -159,6 +162,11 @@ public class UserServiceImpl implements UserService {
        if(userUpdateRequestDTO.getNickname() != null){
            user.setNickname(userUpdateRequestDTO.getNickname());
        }
+
+       //Check Security
+        if(userUpdateRequestDTO.getSecurity() != null){
+            user.setSecurity(userUpdateRequestDTO.getSecurity());
+        }
         //new token
        String token = jwtTokenUtil.generateToken(user);
 
@@ -265,7 +273,6 @@ public class UserServiceImpl implements UserService {
        }
 
         return serviceUtils.convertToDataResponse(userRepository.save(user), UserResponseDTO.class);
-
     }
 
     @Override
@@ -274,8 +281,32 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ListResponse<?> getListFriend(User user) {
-        return serviceUtils.convertToListResponse(relationShipRepository.findAllByUserFromOrUserTo(user,user), FriendResponseDTO.class);
+    public ListResponse<?> searchFriend(User user, String name) {
+        List<User> listUser = userRepository.searchByName(name);
+        List<User> listResult = new ArrayList<>();
+        for(User item : listUser){
+            Optional<RelationShip> relationShipOptional = relationShipRepository.findById(new RelationShipKey(user.getUsername(), item.getUsername()));
+            if(relationShipOptional.isPresent()){
+                listResult.add(item);
+            }else{
+                relationShipOptional = relationShipRepository.findById(new RelationShipKey(item.getUsername(), user.getUsername()));
+                if(relationShipOptional.isPresent()){
+                    listResult.add(item);
+                }
+            }
+        }
+        return serviceUtils.convertToListResponse(listResult, SearchUserResponseDTO.class) ;
+    }
+
+    @Override
+    public ListResponse<?> getListFriendWithPage(User user, Integer size) {
+        return serviceUtils.convertToListResponse(
+                relationShipRepository.findAllByUserFromOrUserTo(
+                        user,
+                        user,
+                        PageRequest.of(size-1, 10).withSort(Sort.by("createDate").descending())
+                ).getContent(),
+                FriendResponseDTO.class);
     }
 
     @Override

@@ -24,6 +24,7 @@ public class UserUpdateRequestDTO {
     private String gender;
     private String nickname;
     private String bio;
+    private String security;
 
 
 }
