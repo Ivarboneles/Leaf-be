@@ -2,6 +2,7 @@ package com.example.leaf.services;
 
 import com.example.leaf.dto.request.PostRequestDTO;
 import com.example.leaf.dto.request.ReactionRequestDTO;
+import com.example.leaf.dto.request.UpdatePostRequestDTO;
 import com.example.leaf.dto.response.DataResponse;
 import com.example.leaf.dto.response.ListResponse;
 import com.example.leaf.entities.Post;
@@ -13,7 +14,7 @@ public interface PostService {
 
     DataResponse<?> uploadFilePost(String postId, MultipartFile[] files, Integer[] types);
 
-    DataResponse<?> updatePost(String id, PostRequestDTO postRequestDTO);
+    DataResponse<?> updatePost(String id, UpdatePostRequestDTO postRequestDTO);
 
     DataResponse<?> deletePost(String id);
     DataResponse<?> hiddenPost(String id);

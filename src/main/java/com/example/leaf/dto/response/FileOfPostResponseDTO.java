@@ -9,6 +9,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class FileOfPostResponseDTO {
 
+    private String id;
     private String value;
     private Integer type;
     private String status;

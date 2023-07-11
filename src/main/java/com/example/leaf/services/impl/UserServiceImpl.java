@@ -276,26 +276,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ListResponse<?> searchUser(String name) {
-        return serviceUtils.convertToListResponse(userRepository.searchByName(name), SearchUserResponseDTO.class) ;
+    public ListResponse<?> searchUser(String name, User user) {
+        System.out.println("Name : "+ name);
+        System.out.println("User : " + user.getUsername());
+        return serviceUtils.convertToListResponse(userRepository.searchByName(name, user.getUsername()), SearchUserResponseDTO.class) ;
     }
 
     @Override
     public ListResponse<?> searchFriend(User user, String name) {
-        List<User> listUser = userRepository.searchByName(name);
-        List<User> listResult = new ArrayList<>();
-        for(User item : listUser){
-            Optional<RelationShip> relationShipOptional = relationShipRepository.findById(new RelationShipKey(user.getUsername(), item.getUsername()));
-            if(relationShipOptional.isPresent()){
-                listResult.add(item);
-            }else{
-                relationShipOptional = relationShipRepository.findById(new RelationShipKey(item.getUsername(), user.getUsername()));
-                if(relationShipOptional.isPresent()){
-                    listResult.add(item);
-                }
-            }
-        }
-        return serviceUtils.convertToListResponse(listResult, SearchUserResponseDTO.class) ;
+        return serviceUtils.convertToListResponse( userRepository.searchFriendByName(name, user.getUsername()), SearchUserResponseDTO.class) ;
     }
 
     @Override

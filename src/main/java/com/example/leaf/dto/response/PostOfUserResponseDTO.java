@@ -15,10 +15,9 @@ public class PostOfUserResponseDTO {
     private PostFatherResponseDTO post;
     private Date createDate;
     private String value;
-    private Integer countComment;
     private String security;
-    private Integer countReaction;
-    private Boolean likedPost = false;
+    private String likedPost = "";
+    private Integer countComment = 0;
+    private List<Integer> countReaction ;
     private List<FileOfPostResponseDTO> files;
-    private List<CommentOfPostResponseDTO> comments;
 }

@@ -77,8 +77,11 @@ public class UserController {
     }
 
     @GetMapping(value = "/search/{name}")
-    public ResponseEntity<?> searchUser(@PathVariable("name") String name){
-        return ResponseEntity.ok(userService.searchUser(name));
+    public ResponseEntity<?> searchUser(@PathVariable("name") String name,
+                                        HttpServletRequest request){
+        return ResponseEntity.ok(userService.searchUser(name,
+                jwtTokenUtil.getUserDetails(JwtTokenUtil.getAccessToken(request))
+                ));
     }
 
     @GetMapping(value = "/search-friend/{name}")

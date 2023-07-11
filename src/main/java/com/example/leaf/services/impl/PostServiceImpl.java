@@ -2,6 +2,7 @@ package com.example.leaf.services.impl;
 
 import com.example.leaf.dto.request.PostRequestDTO;
 import com.example.leaf.dto.request.ReactionRequestDTO;
+import com.example.leaf.dto.request.UpdatePostRequestDTO;
 import com.example.leaf.dto.response.*;
 import com.example.leaf.entities.*;
 import com.example.leaf.entities.enums.StatusEnum;
@@ -21,10 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @Transactional
@@ -80,13 +78,27 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public DataResponse<?> updatePost(String id, PostRequestDTO postRequestDTO) {
+    public DataResponse<?> updatePost(String id, UpdatePostRequestDTO postRequestDTO) {
         Post post = postRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("Can't find post")
         );
 
         if(postRequestDTO.getValue() != null){
             post.setValue(postRequestDTO.getValue());
+        }
+
+        if(postRequestDTO.getSecurity() != null){
+            post.setSecurity(postRequestDTO.getSecurity());
+        }
+
+        List<String> listFiles = postRequestDTO.getDeletedFile();
+        for(String fileId : listFiles){
+            Optional<File> fileOptional = fileRepository.findById(fileId);
+            if(fileOptional.isPresent()){
+                File file = fileOptional.get();
+                file.setStatus(StatusEnum.DISABLE.toString());
+                fileRepository.save(file);
+            }
         }
         return serviceUtils.convertToDataResponse(postRepository.save(post), PostResponseDTO.class);
     }
@@ -270,17 +282,39 @@ public class PostServiceImpl implements PostService {
                     user.getUsername()
             ));
             if(optionalReactionPost.isPresent()){
-                postDTO.setLikedPost(true);
+                postDTO.setLikedPost(optionalReactionPost.get().getReaction().getName());
             }else {
-                postDTO.setLikedPost(false);
+                postDTO.setLikedPost("");
             }
-            postDTO.setCountReaction(reactionPostList.size());
+            Integer[] integers = new Integer[7];
+            Arrays.fill(integers, 0);
+            for(ReactionPost reaction : reactionPostList){
+                switch (reaction.getReaction().getName()){
+                    case "LIKE":
+                        integers[0] += 1;
+                        break;
+                    case "LOVE":
+                        integers[1] += 1;
+                        break;
+                    case "HAHA":
+                        integers[2] += 1;
+                        break;
+                    case "SAD":
+                        integers[3] += 1;
+                        break;
+                    case "ANGRY":
+                        integers[4] += 1;
+                        break;
+                    case "WOW":
+                        integers[5] += 1;
+                        break;
+                    default:
+                        break;
+                }
+            }
+            integers[6] = reactionPostList.size();
+            postDTO.setCountReaction(Arrays.asList(integers));
             postDTO.setCountComment(commentPostList.size());
-            List<CommentOfPostResponseDTO> commentOfPostResponseDTOList = new ArrayList<>();
-            for(int i = 0; i < commentPostList.size() && i < 3; i++){
-                commentOfPostResponseDTOList.add(serviceUtils.convertToResponseDTO(commentPostList.get(i), CommentOfPostResponseDTO.class));
-            }
-            postDTO.setComments(commentOfPostResponseDTOList);
             listDTO.add(postDTO);
         }
         return new ListResponse<>(listDTO);

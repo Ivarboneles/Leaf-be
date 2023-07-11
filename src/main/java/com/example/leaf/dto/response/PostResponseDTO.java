@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -21,9 +22,8 @@ public class PostResponseDTO {
     private String value;
     private String status;
     private String security;
-    private Boolean likedPost = false;
+    private String likedPost = "";
     private Integer countComment = 0;
-    private Integer countReaction = 0;
+    private List<Integer> countReaction ;
     private List<FileOfPostResponseDTO> files;
-    private List<CommentOfPostResponseDTO> comments;
 }

@@ -3,6 +3,7 @@ package com.example.leaf.controller.customer;
 import com.example.leaf.dto.request.CommentRequestDTO;
 import com.example.leaf.dto.request.PostRequestDTO;
 import com.example.leaf.dto.request.ReactionRequestDTO;
+import com.example.leaf.dto.request.UpdatePostRequestDTO;
 import com.example.leaf.services.ImageService;
 import com.example.leaf.services.PostService;
 import com.example.leaf.utils.JwtTokenUtil;
@@ -98,7 +99,7 @@ public class PostController {
 
     @PutMapping(value = "/update/{id}")
     public ResponseEntity<?> updatePost(@PathVariable("id") String id,
-                                        @RequestBody PostRequestDTO postRequestDTO){
+                                        @RequestBody UpdatePostRequestDTO postRequestDTO){
         return ResponseEntity.ok(postService.updatePost(id,postRequestDTO));
     }
 

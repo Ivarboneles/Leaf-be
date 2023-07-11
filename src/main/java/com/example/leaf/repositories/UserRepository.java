@@ -16,8 +16,17 @@ public interface UserRepository extends JpaRepository<User, String> {
     Optional<User> findUserByPhone(String phone);
     Optional<User> findUserByVerificationCodeAndEmail(String verificationCode, String email);
     Optional<User> findUserByUsername(String username);
-    @Query(nativeQuery = true, value ="SELECT * FROM user WHERE name like '%' :name '%' and role_id = 'CUSTOMER'")
-    List<User> searchByName(@Param("name") String text);
+    @Query(nativeQuery = true, value ="SELECT username, avatar, bio, birthday, create_date, email, enable, gender, name, nickname, password, phone, verification_code, address, role_id, security FROM \n" +
+            "(leaf_db.user left join (Select user_from, user_to, status as friend from leaf_db.relationship where user_from = :user or user_to = :user) AS T\n" +
+            "ON user.username = T.user_from or user.username = T.user_to )\n" +
+            "WHERE name like '%' :name '%' and role_id = 'CUSTOMER' and username != :user and (friend != 'BLOCK' OR friend IS NUll )")
+    List<User> searchByName(@Param("name") String text, @Param("user") String user);
+
+    @Query(nativeQuery = true, value ="SELECT username, avatar, bio, birthday, create_date, email, enable, gender, name, nickname, password, phone, verification_code, address, role_id, security FROM \n" +
+            "(leaf_db.user left join (Select user_from, user_to, status as friend from leaf_db.relationship where user_from = :user or user_to = :user) AS T\n" +
+            "ON user.username = T.user_from or user.username = T.user_to )\n" +
+            "WHERE name like '%' :name '%' and role_id = 'CUSTOMER' and username != :user and friend = 'FRIEND'")
+    List<User> searchFriendByName(@Param("name") String text, @Param("user") String user);
     @Query(nativeQuery = true, value = "SELECT * FROM \n" +
             "(\n" +
             "\tSELECT M.user_id, M.item_id, (SUM(rating)/700) AS rating FROM\n" +
