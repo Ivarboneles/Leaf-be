@@ -42,7 +42,7 @@ public class RelationShipServiceImpl implements RelationShipService {
         );
 
         return serviceUtils.convertToListResponse(
-                relationShipRepository.findAllByUserFromOrUserTo(user, user),
+                relationShipRepository.findAllByUserFromOrUserToAndStatus(user, user, RelationEnum.FRIEND.toString()),
                 RelationShipResponseDTO.class
         );
     }
@@ -50,7 +50,7 @@ public class RelationShipServiceImpl implements RelationShipService {
     @Override
     public ListResponse<?> getAllRelationShipByUser(User user) {
         return serviceUtils.convertToListResponse(
-                relationShipRepository.findAllByUserFromOrUserTo(user, user),
+                relationShipRepository.findAllByUserFromOrUserToAndStatus(user, user, RelationEnum.FRIEND.toString()),
                 RelationShipResponseDTO.class
         );
     }
@@ -65,7 +65,7 @@ public class RelationShipServiceImpl implements RelationShipService {
 
     @Override
     public ListResponse<?> getAllFriend(User user) {
-        List<RelationShip> list = relationShipRepository.findAllByUserFromOrUserTo(user,user);
+        List<RelationShip> list = relationShipRepository.findAllByUserFromOrUserToAndStatus(user,user, RelationEnum.FRIEND.toString());
         List<RelationShip> result = new ArrayList<>();
         for(RelationShip relationShip: list){
             if(relationShip.getStatus().equals( RelationEnum.FRIEND.toString())){

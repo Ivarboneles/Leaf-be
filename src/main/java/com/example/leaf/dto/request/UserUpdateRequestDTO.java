@@ -26,5 +26,4 @@ public class UserUpdateRequestDTO {
     private String bio;
     private String security;
 
-
 }

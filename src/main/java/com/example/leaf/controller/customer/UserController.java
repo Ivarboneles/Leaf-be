@@ -102,6 +102,13 @@ public class UserController {
         ));
     }
 
+    @GetMapping(value = "/count-friend")
+    public ResponseEntity<?> getCountFriend(HttpServletRequest request){
+        return ResponseEntity.ok(
+                userService.countFriend(jwtTokenUtil.getUserDetails(JwtTokenUtil.getAccessToken(request)))
+        );
+    }
+
     @GetMapping(value = "/list-post")
     public ResponseEntity<?> getListPost(HttpServletRequest request){
         return ResponseEntity.ok(userService.getListPost(

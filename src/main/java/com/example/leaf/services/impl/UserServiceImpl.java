@@ -6,6 +6,7 @@ import com.example.leaf.entities.ModelAI;
 import com.example.leaf.entities.RelationShip;
 import com.example.leaf.entities.User;
 import com.example.leaf.entities.enums.GenderEnum;
+import com.example.leaf.entities.enums.RelationEnum;
 import com.example.leaf.entities.enums.RoleEnum;
 import com.example.leaf.entities.enums.StatusEnum;
 import com.example.leaf.entities.keys.RelationShipKey;
@@ -201,8 +202,15 @@ public class UserServiceImpl implements UserService {
     public DataResponse<?> getUserById(String username) {
         User user = userRepository.findById(username)
                 .orElseThrow(() -> new ResourceNotFoundException("Could not find user with ID = " + username));
-
-        return serviceUtils.convertToDataResponse(user, UserResponseDTO.class);
+        UserResponseDTO userResponseDTO = serviceUtils.convertToResponseDTO(user, UserResponseDTO.class);
+        userResponseDTO.setCountFriend(
+                relationShipRepository.findAllByUserFromOrUserToAndStatus(
+                        user,
+                        user,
+                        RelationEnum.FRIEND.toString()
+                ).size()
+        );
+        return new DataResponse<>(userResponseDTO);
     }
 
     @Override
@@ -288,11 +296,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public DataResponse<?> countFriend(User user) {
+        return new DataResponse<>(relationShipRepository.findAllByUserFromOrUserToAndStatus(user, user, RelationEnum.FRIEND.toString()).size());
+    }
+
+    @Override
     public ListResponse<?> getListFriendWithPage(User user, Integer size) {
         return serviceUtils.convertToListResponse(
-                relationShipRepository.findAllByUserFromOrUserTo(
+                relationShipRepository.findAllByUserFromOrUserToAndStatus(
                         user,
                         user,
+                        RelationEnum.FRIEND.toString(),
                         PageRequest.of(size-1, 10).withSort(Sort.by("createDate").descending())
                 ).getContent(),
                 FriendResponseDTO.class);

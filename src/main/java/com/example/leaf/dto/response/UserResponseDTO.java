@@ -29,5 +29,6 @@ public class UserResponseDTO {
     private Boolean enable;
     private String avatar;
     private Role role;
-
+    private String security;
+    private Integer countFriend;
 }
