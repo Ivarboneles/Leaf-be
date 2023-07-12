@@ -74,7 +74,7 @@ public class PostServiceImpl implements PostService {
         Integer[] integers = new Integer[7];
         Arrays.fill(integers, 0);
         postResponseDTO.setCountReaction(Arrays.asList(integers));
-        return serviceUtils.convertToDataResponse(postRepository.save(post), PostResponseDTO.class);
+        return new DataResponse<>(postResponseDTO);
     }
 
     @Override
