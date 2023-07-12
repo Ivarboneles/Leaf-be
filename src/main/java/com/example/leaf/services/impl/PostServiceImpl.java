@@ -344,7 +344,9 @@ public class PostServiceImpl implements PostService {
                 user.getUsername()
         ));
         if(optionalReactionPost.isPresent()){
-            postDTO.setLikedPost(optionalReactionPost.get().getReaction().getName());
+            if(optionalReactionPost.get().getStatus().equals(StatusEnum.ENABLE.toString())) {
+                postDTO.setLikedPost(optionalReactionPost.get().getReaction().getName());
+            }
         }else {
             postDTO.setLikedPost("");
         }
