@@ -276,7 +276,7 @@ public class PostServiceImpl implements PostService {
         for(Post item : list){
             PostResponseDTO postDTO = serviceUtils.convertToResponseDTO(item, PostResponseDTO.class);
             List<ReactionPost> reactionPostList = reactionPostRepository.findAllByPostAndStatus(item, StatusEnum.ENABLE.toString());
-            List<Comment> commentPostList = commentRepository.findAllByPostAndStatus(item, StatusEnum.ENABLE.toString(), Sort.by("createDate").descending());
+            List<Comment> commentPostList = commentRepository.findAllByPostAndStatusAndCommentIsNull(item, StatusEnum.ENABLE.toString(), Sort.by("createDate").descending());
             Optional<ReactionPost> optionalReactionPost = reactionPostRepository.findById(new ReactionPostKey(
                     item.getId(),
                     user.getUsername()
