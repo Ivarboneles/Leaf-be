@@ -65,8 +65,12 @@ public class PostController {
     }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<?> getPostById(@PathVariable(name= "id") UUID id){
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> getPostById(@PathVariable(name= "id") String id,
+                                         HttpServletRequest request){
+
+        return ResponseEntity.ok(postService.getPostById(id,
+                jwtTokenUtil.getUserDetails(JwtTokenUtil.getAccessToken(request)
+                )));
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

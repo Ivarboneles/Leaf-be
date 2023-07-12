@@ -17,6 +17,8 @@ public interface PostService {
     DataResponse<?> updatePost(String id, UpdatePostRequestDTO postRequestDTO);
 
     DataResponse<?> deletePost(String id);
+
+    DataResponse<?> getPostById(String id, User user);
     DataResponse<?> hiddenPost(String id);
     DataResponse<?> changeSecurityPost(String postId, String security, User user);
     ListResponse<?> getListPostOfUser(User user);

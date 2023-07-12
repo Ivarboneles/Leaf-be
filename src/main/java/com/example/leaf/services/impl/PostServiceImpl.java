@@ -5,8 +5,10 @@ import com.example.leaf.dto.request.ReactionRequestDTO;
 import com.example.leaf.dto.request.UpdatePostRequestDTO;
 import com.example.leaf.dto.response.*;
 import com.example.leaf.entities.*;
+import com.example.leaf.entities.enums.RelationEnum;
 import com.example.leaf.entities.enums.StatusEnum;
 import com.example.leaf.entities.keys.ReactionPostKey;
+import com.example.leaf.entities.keys.RelationShipKey;
 import com.example.leaf.exceptions.InvalidValueException;
 import com.example.leaf.exceptions.ResourceNotFoundException;
 import com.example.leaf.repositories.*;
@@ -29,6 +31,9 @@ import java.util.*;
 public class PostServiceImpl implements PostService {
     @Autowired
     PostRepository postRepository;
+
+    @Autowired
+    RelationShipRepository relationShipRepository;
     @Autowired
     ServiceUtils serviceUtils;
     @Autowired
@@ -114,6 +119,52 @@ public class PostServiceImpl implements PostService {
             throw new InvalidValueException("Can't delete post " + e.getMessage());
         }
         return dataResponse;
+    }
+
+    @Override
+    public DataResponse<?> getPostById(String id, User user) {
+        Post post = postRepository.findByIdAndStatus(id, StatusEnum.ENABLE.toString()).orElseThrow(
+                () -> new ResourceNotFoundException("Can't find post")
+        );
+
+        if(post.getUser() == user){
+            return new DataResponse<>(countReactionCommentOfOnePost(post, user));
+        }
+
+        Boolean flag = false;
+        Optional<RelationShip> relationShipOptional1 = relationShipRepository.findById(
+                new RelationShipKey(post.getUser().getUsername(), user.getUsername())
+        );
+
+        if(relationShipOptional1.isPresent()){
+            if(relationShipOptional1.get().getStatus().equals("FRIEND")){
+                flag = true;
+            }else if (relationShipOptional1.get().getStatus().equals("BLOCK")){
+                throw new ResourceNotFoundException("You is blocked by " + post.getUser().getUsername());
+            }
+        }
+
+        Optional<RelationShip> relationShipOptional2 = relationShipRepository.findById(
+                new RelationShipKey(user.getUsername(), post.getUser().getUsername())
+        );
+
+        if(relationShipOptional2.isPresent()){
+            if(relationShipOptional2.get().getStatus().equals("FRIEND")){
+                flag = true;
+            }else if (relationShipOptional2.get().getStatus().equals("BLOCK")){
+                throw new ResourceNotFoundException("You is blocked by " + post.getUser().getUsername());
+            }
+        }
+
+        if(flag){
+            return new DataResponse<>(countReactionCommentOfOnePost(post, user));
+        }
+
+        if(post.getSecurity().equals("PUBLIC")){
+            return new DataResponse<>(countReactionCommentOfOnePost(post, user));
+        }
+
+       throw new ResourceNotFoundException("Post is private");
     }
 
     @Override
@@ -274,50 +325,55 @@ public class PostServiceImpl implements PostService {
     ListResponse<?> countCommentReactionPost(List<Post> list, User user){
         List<PostResponseDTO> listDTO = new ArrayList<>();
         for(Post item : list){
-            PostResponseDTO postDTO = serviceUtils.convertToResponseDTO(item, PostResponseDTO.class);
-            List<ReactionPost> reactionPostList = reactionPostRepository.findAllByPostAndStatus(item, StatusEnum.ENABLE.toString());
-            List<Comment> commentPostList = commentRepository.findAllByPostAndStatusAndCommentIsNull(item, StatusEnum.ENABLE.toString(), Sort.by("createDate").descending());
-            Optional<ReactionPost> optionalReactionPost = reactionPostRepository.findById(new ReactionPostKey(
-                    item.getId(),
-                    user.getUsername()
-            ));
-            if(optionalReactionPost.isPresent()){
-                postDTO.setLikedPost(optionalReactionPost.get().getReaction().getName());
-            }else {
-                postDTO.setLikedPost("");
-            }
-            Integer[] integers = new Integer[7];
-            Arrays.fill(integers, 0);
-            for(ReactionPost reaction : reactionPostList){
-                switch (reaction.getReaction().getName()){
-                    case "LIKE":
-                        integers[0] += 1;
-                        break;
-                    case "LOVE":
-                        integers[1] += 1;
-                        break;
-                    case "HAHA":
-                        integers[2] += 1;
-                        break;
-                    case "SAD":
-                        integers[3] += 1;
-                        break;
-                    case "ANGRY":
-                        integers[4] += 1;
-                        break;
-                    case "WOW":
-                        integers[5] += 1;
-                        break;
-                    default:
-                        break;
-                }
-            }
-            integers[6] = reactionPostList.size();
-            postDTO.setCountReaction(Arrays.asList(integers));
-            postDTO.setCountComment(commentPostList.size());
-            listDTO.add(postDTO);
+            listDTO.add(countReactionCommentOfOnePost(item, user));
         }
         return new ListResponse<>(listDTO);
+    }
+
+    public PostResponseDTO countReactionCommentOfOnePost(Post post, User user){
+        PostResponseDTO postDTO = serviceUtils.convertToResponseDTO(post, PostResponseDTO.class);
+        List<ReactionPost> reactionPostList = reactionPostRepository.findAllByPostAndStatus(post, StatusEnum.ENABLE.toString());
+        List<Comment> commentPostList = commentRepository.findAllByPostAndStatusAndCommentIsNull(post, StatusEnum.ENABLE.toString(), Sort.by("createDate").descending());
+        Optional<ReactionPost> optionalReactionPost = reactionPostRepository.findById(new ReactionPostKey(
+                post.getId(),
+                user.getUsername()
+        ));
+        if(optionalReactionPost.isPresent()){
+            postDTO.setLikedPost(optionalReactionPost.get().getReaction().getName());
+        }else {
+            postDTO.setLikedPost("");
+        }
+        Integer[] integers = new Integer[7];
+        Arrays.fill(integers, 0);
+        for(ReactionPost reaction : reactionPostList){
+            switch (reaction.getReaction().getName()){
+                case "LIKE":
+                    integers[0] += 1;
+                    break;
+                case "LOVE":
+                    integers[1] += 1;
+                    break;
+                case "HAHA":
+                    integers[2] += 1;
+                    break;
+                case "SAD":
+                    integers[3] += 1;
+                    break;
+                case "ANGRY":
+                    integers[4] += 1;
+                    break;
+                case "WOW":
+                    integers[5] += 1;
+                    break;
+                default:
+                    break;
+            }
+        }
+        integers[6] = reactionPostList.size();
+        postDTO.setCountReaction(Arrays.asList(integers));
+        postDTO.setCountComment(commentPostList.size());
+
+        return postDTO;
     }
 }
 
