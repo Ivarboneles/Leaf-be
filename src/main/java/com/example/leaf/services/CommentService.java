@@ -22,5 +22,5 @@ public interface CommentService {
 
     ListResponse<?> getAllCommentByPostAndPageSize(String postId, Integer size);
 
-    ListResponse<?> getAllCommentByFatherAndPageSize(String fatherId, Integer size);
+    ListResponse<?> getAllCommentByFather(String fatherId);
 }

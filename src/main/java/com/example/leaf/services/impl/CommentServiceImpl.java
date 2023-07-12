@@ -166,16 +166,14 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public ListResponse<?> getAllCommentByFatherAndPageSize(String fatherId, Integer size) {
+    public ListResponse<?> getAllCommentByFather(String fatherId) {
         Comment comment = commentRepository.findById(fatherId).orElseThrow(
                 () -> new ResourceNotFoundException("Can't find comment"));
 
         return serviceUtils.convertToListResponse(
                 commentRepository.findAllByCommentAndStatus(
                         comment,
-                        StatusEnum.ENABLE.toString(),
-                        PageRequest.of(size-1, 5).withSort(Sort.by("createDate").descending())
-                ).getContent(),
+                        StatusEnum.ENABLE.toString()),
                 CommentOfPostResponseDTO.class
         );
     }

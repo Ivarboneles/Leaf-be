@@ -30,11 +30,10 @@ public class CommentController {
         );
     }
 
-    @GetMapping(value = "/child-comment/{id}/{size}")
-    public ResponseEntity<?> getAllCommentByFather(@PathVariable(name = "id") String id,
-                                                 @PathVariable(name = "size") Integer size){
+    @GetMapping(value = "/child-comment/{id}")
+    public ResponseEntity<?> getAllCommentByFather(@PathVariable(name = "id") String id){
         return ResponseEntity.ok(
-                commentService.getAllCommentByFatherAndPageSize(id, size)
+                commentService.getAllCommentByFather(id)
         );
     }
 
