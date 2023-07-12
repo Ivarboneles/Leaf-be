@@ -70,6 +70,10 @@ public class PostServiceImpl implements PostService {
             //upload post's file
             uploadFile(files, post, postRequestDTO.getType());
         }
+        PostResponseDTO postResponseDTO = serviceUtils.convertToResponseDTO(postRepository.save(post), PostResponseDTO.class);
+        Integer[] integers = new Integer[7];
+        Arrays.fill(integers, 0);
+        postResponseDTO.setCountReaction(Arrays.asList(integers));
         return serviceUtils.convertToDataResponse(postRepository.save(post), PostResponseDTO.class);
     }
 
@@ -83,7 +87,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public DataResponse<?> updatePost(String id, UpdatePostRequestDTO postRequestDTO) {
+    public DataResponse<?> updatePost(String id, UpdatePostRequestDTO postRequestDTO, User user) {
         Post post = postRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("Can't find post")
         );
@@ -105,7 +109,8 @@ public class PostServiceImpl implements PostService {
                 fileRepository.save(file);
             }
         }
-        return serviceUtils.convertToDataResponse(postRepository.save(post), PostResponseDTO.class);
+
+        return new DataResponse<>(countReactionCommentOfOnePost(post, user));
     }
 
     @Override

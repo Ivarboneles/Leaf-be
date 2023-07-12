@@ -14,7 +14,7 @@ public interface PostService {
 
     DataResponse<?> uploadFilePost(String postId, MultipartFile[] files, Integer[] types);
 
-    DataResponse<?> updatePost(String id, UpdatePostRequestDTO postRequestDTO);
+    DataResponse<?> updatePost(String id, UpdatePostRequestDTO postRequestDTO, User user);
 
     DataResponse<?> deletePost(String id);
 

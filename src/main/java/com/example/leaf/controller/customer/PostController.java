@@ -103,8 +103,11 @@ public class PostController {
 
     @PutMapping(value = "/update/{id}")
     public ResponseEntity<?> updatePost(@PathVariable("id") String id,
-                                        @RequestBody UpdatePostRequestDTO postRequestDTO){
-        return ResponseEntity.ok(postService.updatePost(id,postRequestDTO));
+                                        @RequestBody UpdatePostRequestDTO postRequestDTO,
+                                        HttpServletRequest request){
+        return ResponseEntity.ok(postService.updatePost(id,postRequestDTO,
+                jwtTokenUtil.getUserDetails(JwtTokenUtil.getAccessToken(request))
+                ));
     }
 
     @DeleteMapping(value = "/{id}")
