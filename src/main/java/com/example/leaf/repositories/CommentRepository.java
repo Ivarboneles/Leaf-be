@@ -12,5 +12,9 @@ import java.util.UUID;
 
 public interface CommentRepository extends JpaRepository<Comment, String> {
     List<Comment> findAllByPostAndStatus(Post post, String status, Sort sort);
-    Page<Comment> findAllByPostAndStatus(Post post, String status, Pageable pageable);
+    Page<Comment> findAllByPostAndStatusAndCommentIsNull(Post post, String status, Pageable pageable);
+
+    List<Comment> findAllByCommentAndStatus(Comment comment, String status);
+    Page<Comment> findAllByCommentAndStatus(Comment comment, String status, Pageable pageable);
+
 }

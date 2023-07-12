@@ -20,6 +20,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -145,11 +146,37 @@ public class CommentServiceImpl implements CommentService {
         Post post = postRepository.findById(postId).orElseThrow(
                 () -> new ResourceNotFoundException("Can't find post"));
 
-        List<Comment> commentList = commentRepository.findAllByPostAndStatus(
+        List<Comment> commentList = commentRepository.findAllByPostAndStatusAndCommentIsNull(
                 post,
                 StatusEnum.ENABLE.toString(),
                 PageRequest.of(size-1, 10).withSort(Sort.by("createDate").descending())
         ).getContent();
-        return serviceUtils.convertToListResponse(commentList, CommentOfPostResponseDTO.class);
+
+        List<CommentOfPostResponseDTO> dtoList = new ArrayList<>();
+
+        for(Comment comment : commentList){
+            CommentOfPostResponseDTO commentDTO = serviceUtils.convertToResponseDTO(comment, CommentOfPostResponseDTO.class);
+            commentDTO.setCountRep(
+                    commentRepository.findAllByCommentAndStatus(comment, StatusEnum.ENABLE.toString()).size()
+            );
+
+            dtoList.add(commentDTO);
+        }
+        return new ListResponse<>(dtoList);
+    }
+
+    @Override
+    public ListResponse<?> getAllCommentByFatherAndPageSize(String fatherId, Integer size) {
+        Comment comment = commentRepository.findById(fatherId).orElseThrow(
+                () -> new ResourceNotFoundException("Can't find comment"));
+
+        return serviceUtils.convertToListResponse(
+                commentRepository.findAllByCommentAndStatus(
+                        comment,
+                        StatusEnum.ENABLE.toString(),
+                        PageRequest.of(size-1, 5).withSort(Sort.by("createDate").descending())
+                ).getContent(),
+                CommentOfPostResponseDTO.class
+        );
     }
 }

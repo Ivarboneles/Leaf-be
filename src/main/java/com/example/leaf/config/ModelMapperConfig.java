@@ -55,7 +55,6 @@ public class ModelMapperConfig {
             m.map(Comment::getValue, CommentOfPostResponseDTO::setValue);
             m.map(Comment::getType, CommentOfPostResponseDTO::setType);
             m.map(Comment::getStatus, CommentOfPostResponseDTO::setStatus);
-            m.map(Comment::getComment, CommentOfPostResponseDTO::setComment);
         });
         //Mapper Comment -> CommentFatherResponseDTO
         modelMapper.createTypeMap(Comment.class, CommentFatherResponseDTO.class).addMappings( m -> {

@@ -21,4 +21,6 @@ public interface CommentService {
     DataResponse<?> unReactionComment(String commentId, User user);
 
     ListResponse<?> getAllCommentByPostAndPageSize(String postId, Integer size);
+
+    ListResponse<?> getAllCommentByFatherAndPageSize(String fatherId, Integer size);
 }

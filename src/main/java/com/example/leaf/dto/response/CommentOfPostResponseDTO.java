@@ -19,10 +19,10 @@ import java.util.List;
 public class CommentOfPostResponseDTO {
     private String id;
     private SearchUserResponseDTO user;
-    private CommentFatherResponseDTO comment;
     private String value;
     private Integer type;
     private Date createDate;
     private String status;
+    private Integer countRep = 0;
     private List<ReactionOfCommentResponseDTO> reactions;
 }
