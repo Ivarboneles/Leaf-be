@@ -10,7 +10,7 @@ public interface UserService {
     DataResponse<?> saveUser(RegisterUserRequestDTO registerUserRequestDTO);
     DataResponse<?> updateUser(User user, UserUpdateRequestDTO userUpdateRequestDTO);
     DataResponse<?> changePassword(String username, ChangePasswordRequestDTO changePasswordRequestDTO);
-    DataResponse<?> getUserById(String username);
+    DataResponse<?> getUserById(String username, User user);
     DataResponse<?> verifyUser(VerifyRequestDTO verifyRequestDTO);
 
     DataResponse<?> sendVerifyCode(String email);
@@ -22,6 +22,8 @@ public interface UserService {
     DataResponse<?> forgotPassword(User user, ForgotPasswordRequestDTO forgotPasswordRequestDTO);
 
     ListResponse<?> searchUser(String name, User user);
+
+    ListResponse<?> getRecommendFriend(User user);
 
     ListResponse<?> searchFriend(User user, String name);
 

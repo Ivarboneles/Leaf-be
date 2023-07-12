@@ -72,8 +72,11 @@ public class UserController {
     }
 
     @GetMapping(value = "/{username}")
-    public ResponseEntity<?> getUser(@PathVariable("username") String username){
-        return ResponseEntity.ok(userService.getUserById(username));
+    public ResponseEntity<?> getUser(@PathVariable("username") String username,
+                                     HttpServletRequest request){
+        return ResponseEntity.ok(userService.getUserById(username,
+                jwtTokenUtil.getUserDetails(JwtTokenUtil.getAccessToken(request))
+                ));
     }
 
     @GetMapping(value = "/search/{name}")
@@ -90,6 +93,14 @@ public class UserController {
         return ResponseEntity.ok(userService.searchFriend(
                 jwtTokenUtil.getUserDetails(JwtTokenUtil.getAccessToken(request)),
                 name
+        ));
+    }
+
+    @GetMapping(value = "/recomend-friend")
+    public ResponseEntity<?> getRecommendFriend(HttpServletRequest request){
+
+        return ResponseEntity.ok(userService.getRecommendFriend(
+                jwtTokenUtil.getUserDetails(JwtTokenUtil.getAccessToken(request))
         ));
     }
 

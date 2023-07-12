@@ -1,4 +1,4 @@
-package com.example.leaf.entities;
+package com.example.leaf.repositories.model;
 
 public interface ModelAI {
     String getUser_id();

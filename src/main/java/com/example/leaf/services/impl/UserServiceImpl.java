@@ -2,14 +2,11 @@ package com.example.leaf.services.impl;
 
 import com.example.leaf.dto.request.*;
 import com.example.leaf.dto.response.*;
-import com.example.leaf.entities.ModelAI;
-import com.example.leaf.entities.RelationShip;
 import com.example.leaf.entities.User;
 import com.example.leaf.entities.enums.GenderEnum;
 import com.example.leaf.entities.enums.RelationEnum;
 import com.example.leaf.entities.enums.RoleEnum;
 import com.example.leaf.entities.enums.StatusEnum;
-import com.example.leaf.entities.keys.RelationShipKey;
 import com.example.leaf.exceptions.InvalidValueException;
 import com.example.leaf.exceptions.ResourceAlreadyExistsException;
 import com.example.leaf.exceptions.ResourceNotFoundException;
@@ -18,24 +15,13 @@ import com.example.leaf.repositories.PostRepository;
 import com.example.leaf.repositories.RelationShipRepository;
 import com.example.leaf.repositories.RoleRepository;
 import com.example.leaf.repositories.UserRepository;
+import com.example.leaf.repositories.model.ModelCommonFriend;
 import com.example.leaf.services.ImageService;
 import com.example.leaf.services.UserService;
 import com.example.leaf.utils.JwtTokenUtil;
 import com.example.leaf.utils.ServiceUtils;
-import net.bytebuddy.utility.RandomString;
 
 import org.apache.mahout.cf.taste.common.TasteException;
-import org.apache.mahout.cf.taste.impl.common.FastByIDMap;
-import org.apache.mahout.cf.taste.impl.model.GenericDataModel;
-import org.apache.mahout.cf.taste.impl.model.GenericUserPreferenceArray;
-import org.apache.mahout.cf.taste.impl.neighborhood.NearestNUserNeighborhood;
-import org.apache.mahout.cf.taste.impl.recommender.GenericUserBasedRecommender;
-import org.apache.mahout.cf.taste.impl.similarity.PearsonCorrelationSimilarity;
-import org.apache.mahout.cf.taste.model.DataModel;
-import org.apache.mahout.cf.taste.model.PreferenceArray;
-import org.apache.mahout.cf.taste.neighborhood.UserNeighborhood;
-import org.apache.mahout.cf.taste.recommender.RecommendedItem;
-import org.apache.mahout.cf.taste.similarity.UserSimilarity;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -50,7 +36,6 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.transaction.Transactional;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -199,14 +184,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public DataResponse<?> getUserById(String username) {
-        User user = userRepository.findById(username)
+    public DataResponse<?> getUserById(String username, User user) {
+        User searchUser = userRepository.findById(username)
                 .orElseThrow(() -> new ResourceNotFoundException("Could not find user with ID = " + username));
-        UserResponseDTO userResponseDTO = serviceUtils.convertToResponseDTO(user, UserResponseDTO.class);
+        UserResponseDTO userResponseDTO = serviceUtils.convertToResponseDTO(searchUser, UserResponseDTO.class);
+        List<ModelCommonFriend> commonFriendList = userRepository.getCommonFriend(username, user.getUsername());
+        System.out.println(commonFriendList);
+        for(ModelCommonFriend item : commonFriendList){
+            userResponseDTO.setCountCommonFriend(item.getCommon());
+        }
         userResponseDTO.setCountFriend(
                 relationShipRepository.findAllByUserFromOrUserToAndStatus(
-                        user,
-                        user,
+                        searchUser,
+                        searchUser,
                         RelationEnum.FRIEND.toString()
                 ).size()
         );
@@ -288,6 +278,15 @@ public class UserServiceImpl implements UserService {
         System.out.println("Name : "+ name);
         System.out.println("User : " + user.getUsername());
         return serviceUtils.convertToListResponse(userRepository.searchByName(name, user.getUsername()), SearchUserResponseDTO.class) ;
+    }
+
+    @Override
+    public ListResponse<?> getRecommendFriend(User user) {
+        try {
+            return new ListResponse<>(serviceUtils.recomendFriend(user));
+        } catch (TasteException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

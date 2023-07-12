@@ -1,13 +1,12 @@
 package com.example.leaf.repositories;
 
-import com.example.leaf.entities.ModelAI;
+import com.example.leaf.repositories.model.ModelAI;
 import com.example.leaf.entities.User;
-import org.springframework.data.domain.Sort;
+import com.example.leaf.repositories.model.ModelCommonFriend;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import javax.sql.DataSource;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,14 +18,30 @@ public interface UserRepository extends JpaRepository<User, String> {
     @Query(nativeQuery = true, value ="SELECT username, avatar, bio, birthday, create_date, email, enable, gender, name, nickname, password, phone, verification_code, address, role_id, security FROM \n" +
             "(leaf_db.user left join (Select user_from, user_to, status as friend from leaf_db.relationship where user_from = :user or user_to = :user) AS T\n" +
             "ON user.username = T.user_from or user.username = T.user_to )\n" +
-            "WHERE name like '%' :name '%' and role_id = 'CUSTOMER' and username != :user and (friend != 'BLOCK' OR friend IS NUll )")
+            "WHERE name like '%' :name '%' and role_id = 'CUSTOMER' and username != :user and (friend != 'BLOCK' OR friend IS NUll ) LIMIT 8")
     List<User> searchByName(@Param("name") String text, @Param("user") String user);
 
     @Query(nativeQuery = true, value ="SELECT username, avatar, bio, birthday, create_date, email, enable, gender, name, nickname, password, phone, verification_code, address, role_id, security FROM \n" +
             "(leaf_db.user left join (Select user_from, user_to, status as friend from leaf_db.relationship where user_from = :user or user_to = :user) AS T\n" +
             "ON user.username = T.user_from or user.username = T.user_to )\n" +
-            "WHERE name like '%' :name '%' and role_id = 'CUSTOMER' and username != :user and friend = 'FRIEND'")
+            "WHERE name like '%' :name '%' and role_id = 'CUSTOMER' and username != :user and friend = 'FRIEND' LIMIT 10")
     List<User> searchFriendByName(@Param("name") String text, @Param("user") String user);
+
+    @Query(nativeQuery = true, value = "SELECT T.user as user1, P.user as user2, COUNT(*) as common FROM\n" +
+            "(\n" +
+            "\tSELECT user_from as user, user_to as friend FROM leaf_db.relationship WHERE user_from = :user1 \n" +
+            "\tUNION\n" +
+            "\tSELECT user_to as user, user_from as friend FROM leaf_db.relationship WHERE user_to = :user1 \n" +
+            ") AS T\n" +
+            "JOIN\n" +
+            "(\n" +
+            "\tSELECT user_from as user, user_to as friend FROM leaf_db.relationship WHERE user_from = :user2 \n" +
+            "\tUNION\n" +
+            "\tSELECT user_to as user, user_from as friend FROM leaf_db.relationship WHERE user_to = :user2 \n" +
+            ") AS P\n" +
+            "ON T.friend = P.friend\n" +
+            "GROUP BY T.user, P.user")
+    List<ModelCommonFriend> getCommonFriend(@Param("user1") String user1, @Param("user2") String user2);
     @Query(nativeQuery = true, value = "SELECT * FROM \n" +
             "(\n" +
             "\tSELECT M.user_id, M.item_id, (SUM(rating)/700) AS rating FROM\n" +
@@ -84,7 +99,7 @@ public interface UserRepository extends JpaRepository<User, String> {
             "\t) AS M\n" +
             "\tGROUP BY user_id, item_id\n" +
             ") AS MM\n" +
-            "WHERE rating > (300/700)\n" +
+            "WHERE rating > (:rating/700)\n" +
             "ORDER BY user_id ASC, item_id ASC")
-    List<ModelAI> getDataSourceForAI();
+    List<ModelAI> getDataSourceForAI(@Param("rating") Integer rating);
 }

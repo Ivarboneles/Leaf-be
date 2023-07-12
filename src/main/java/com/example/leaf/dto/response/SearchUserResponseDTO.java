@@ -11,4 +11,5 @@ public class SearchUserResponseDTO {
     private String username;
     private String name;
     private String avatar;
+    private Integer countCommonFriend = 0;
 }

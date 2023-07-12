@@ -30,5 +30,6 @@ public class UserResponseDTO {
     private String avatar;
     private Role role;
     private String security;
-    private Integer countFriend;
+    private Integer countFriend = 0;
+    private Integer countCommonFriend = 0;
 }
