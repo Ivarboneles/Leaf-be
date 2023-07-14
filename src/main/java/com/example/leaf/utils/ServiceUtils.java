@@ -137,6 +137,88 @@ public class ServiceUtils {
         return userList;
     }
 
+    public List<User> recommendUser (User user) throws TasteException {
+        List<ModelAI> list = userRepository.getDataSourceForAI(200);
+        List<String> listUserName = new ArrayList<>();
+        List<String> listItemName = new ArrayList<>();
+
+        listItemName.add("A");
+        listUserName.add("A");
+        for(ModelAI item : list ){
+            if(!listUserName.contains(item.getUser_id())){
+                listUserName.add(item.getUser_id());
+            }
+
+            if(!listItemName.contains(item.getItem_id())){
+                listItemName.add(item.getItem_id());
+            }
+        }
+
+        FastByIDMap<PreferenceArray> preferenceMap = convertListToFastByIDMap(list, listItemName, listUserName);
+
+        List<RecommendedItem> recommendations = recommendedItems(preferenceMap, listUserName, user);
+//        for(RecommendedItem item : recommendations){
+//            System.out.println(listItemName.get(Math.toIntExact(item.getItemID())));
+//        }
+        // Print recommendations
+        List<User> userList = new ArrayList<>();
+        for (RecommendedItem recommendation : recommendations) {
+            String recommendUsername = listItemName.get(Math.toIntExact(recommendation.getItemID()));
+            Optional<User> recommendUserOpt = userRepository.findUserByUsername(recommendUsername);
+
+            if(recommendUserOpt.isPresent()){
+                User recommendUser = recommendUserOpt.get();
+                Boolean flag = true;
+
+                if (user.getUsername().equals(recommendUsername)){
+                    flag = false;
+                }
+
+                if(flag) {
+                    Optional<RelationShip> relationShipOptional1 = relationShipRepository.findById(
+                            new RelationShipKey(user.getUsername(), recommendUsername)
+                    );
+
+                    if (relationShipOptional1.isPresent()) {
+                        if (relationShipOptional1.get().getStatus().equals("BLOCK")) {
+                            flag = false;
+                        }else {
+                            if(!relationShipOptional1.get().getStatus().equals("FRIEND") && recommendUser.getSecurity().equals("PRIVATE")){
+                                flag = false;
+                            }
+                        }
+                    }
+
+                    Optional<RelationShip> relationShipOptional2 = relationShipRepository.findById(
+                            new RelationShipKey(recommendUsername, user.getUsername())
+                    );
+
+                    if (relationShipOptional2.isPresent()) {
+                        if (relationShipOptional2.get().getStatus().equals("BLOCK")) {
+                            flag = false;
+                        }else {
+                            if(!relationShipOptional2.get().getStatus().equals("FRIEND") && recommendUser.getSecurity().equals("PRIVATE")){
+                                flag = false;
+                            }
+                        }
+                    }
+                }
+
+                if(flag){
+                    userList.add(recommendUser);
+                }
+
+            }
+
+        }
+
+        if(userList.isEmpty()){
+            userList = userRepository.findAll( PageRequest.of(0, 8).withSort(Sort.by("createDate").descending())).stream().toList();
+        }
+
+        return userList;
+    }
+
     public FastByIDMap<PreferenceArray> convertListToFastByIDMap(List<ModelAI> list, List<String> listItemName, List<String> listUserName){
         FastByIDMap<PreferenceArray> preferenceMap = new FastByIDMap<>();
         for (ModelAI item : list) {

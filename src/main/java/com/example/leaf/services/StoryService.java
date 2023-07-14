@@ -11,7 +11,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.UUID;
 
 public interface StoryService {
-    DataResponse<?> createStory(StoryRequestDTO  requestDTO, User user, MultipartFile[] files);
+    DataResponse<?> createStory(User user, MultipartFile[] files);
+    ListResponse<?> getAllStoryByUser(User user);
+
+    DataResponse<?> getStoryById(String id);
     ListResponse<?> getListStory(User user);
     DataResponse<?> deletetStory(String id);
 }

@@ -29,52 +29,45 @@ public class StoryController {
 
 
     @GetMapping(value = "/user")
-    public ResponseEntity<?> getAllStoryByUser( @PathVariable(name = "username") String username){
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> getAllStoryByUser( HttpServletRequest request){
+        return ResponseEntity.ok(
+                storyService.getAllStoryByUser(
+                        jwtTokenUtil.getUserDetails(JwtTokenUtil.getAccessToken(request))
+                )
+        );
+    }
+
+    @GetMapping(value = "/list-story")
+    public ResponseEntity<?> getListStory(HttpServletRequest request){
+        return ResponseEntity.ok(
+                storyService.getListStory(
+                        jwtTokenUtil.getUserDetails(JwtTokenUtil.getAccessToken(request))
+                )
+        );
     }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<?> getStoryById(@PathVariable(name= "id") UUID id){
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> getStoryById(@PathVariable(name= "id") String id){
+        return ResponseEntity.ok(
+            storyService.getStoryById(id)
+        );
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(encoding = @Encoding(name = "storyRequestDTO", contentType = "application/json")))
-    public ResponseEntity<?> createStory(@RequestBody StoryRequestDTO storyRequestDTO,
-                                         @RequestPart(value = "files", required = false) MultipartFile[] files,
+//    @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(encoding = @Encoding(name = "storyRequestDTO", contentType = "application/json")))
+    public ResponseEntity<?> createStory(@RequestBody MultipartFile[] files,
                                          HttpServletRequest request){
         return ResponseEntity.ok(storyService.createStory(
-                storyRequestDTO,
                 jwtTokenUtil.getUserDetails(JwtTokenUtil.getAccessToken(request)),
                 files
                 ));
     }
 
-    @PutMapping
-    public ResponseEntity<?> updateStory(@RequestBody StoryRequestDTO storyRequestDTO){
-        return ResponseEntity.ok().build();
-    }
-
     @DeleteMapping(value = "/{id}")
-    public ResponseEntity<?> deleteStory(@PathVariable(name= "id") UUID id){
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> deleteStory(@PathVariable(name= "id") String id){
+        return ResponseEntity.ok(
+            storyService.deletetStory(id)
+        );
     }
 
-    @PostMapping(value = "/share/{id}")
-    public ResponseEntity<?> shareStory( @PathVariable(name = "id") UUID id,
-                                           @RequestBody StoryRequestDTO storyRequestDTO){
-        return ResponseEntity.ok().build();
-    }
-
-    @PostMapping(value = "/reaction/{id}")
-    public ResponseEntity<?> reactionStory( @PathVariable(name = "id") UUID id,
-                                              @RequestBody ReactionRequestDTO reactionRequestDTO){
-        return ResponseEntity.ok().build();
-    }
-
-    @PostMapping(value = "/un-reaction/{id}")
-    public ResponseEntity<?> unReactionStory( @PathVariable(name = "id") UUID id,
-                                                @RequestBody ReactionRequestDTO reactionRequestDTO){
-        return ResponseEntity.ok().build();
-    }
 }
