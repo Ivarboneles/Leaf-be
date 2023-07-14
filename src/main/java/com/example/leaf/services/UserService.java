@@ -32,6 +32,9 @@ public interface UserService {
     ListResponse<?> getListFriendWithPage(User user, Integer size);
 
     ListResponse<?> getListPost(User user);
+    ListResponse<?> getListUserOfPage(Integer page);
+    DataResponse<?> disableUser(String username);
+    DataResponse<?> enableUser(String username);
 }
 
 

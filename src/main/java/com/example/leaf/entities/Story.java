@@ -37,6 +37,8 @@ public class Story {
     @NotNull(message = "Value is required")
     private String value;
 
+    private String music;
+
     @NotNull(message = "Status is required")
     private String status;
 }

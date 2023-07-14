@@ -1,27 +1,30 @@
 package com.example.leaf.controller.admin;
 
 import com.example.leaf.dto.request.PostRequestDTO;
+import com.example.leaf.services.PostService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
 @RestController
-@RequestMapping(value = "/api/v1")
+@RequestMapping(value = "/api/v1/admin")
 public class PostManagerController {
-    @GetMapping(value = "/disable/post/{id}")
-    public ResponseEntity<?> disableUser(@PathVariable(value = "id") UUID id){
-        return ResponseEntity.ok().build();
+
+    @Autowired
+    PostService postService;
+    @PostMapping(value = "post/disable/{id}")
+    public ResponseEntity<?> disablePost(@PathVariable(value = "id") String id){
+        return ResponseEntity.ok(postService.disablePost(id));
+    }
+    @PostMapping(value = "post/enable/{username}")
+    public ResponseEntity<?> enablePost(@PathVariable(value = "id")  String id){
+        return ResponseEntity.ok(postService.enablePost(id));
     }
 
-    @GetMapping(value = "/enable/post/{id}")
-    public ResponseEntity<?> enableUser(@PathVariable(value = "id") UUID id){
-        return ResponseEntity.ok().build();
-    }
-
-    @PutMapping(value = "/change-content/{id}")
-    public ResponseEntity<?> changeContentPost(@PathVariable(value = "id") UUID id,
-                                               @RequestBody PostRequestDTO postRequestDTO){
-        return ResponseEntity.ok().build();
+    @GetMapping(value = "/all-post/{page}")
+    public ResponseEntity<?> getListPostOfPage(@PathVariable(value = "page") Integer page){
+        return ResponseEntity.ok(postService.getListPostOfPage(page));
     }
 }

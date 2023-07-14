@@ -13,5 +13,7 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 public class StoryRequestDTO {
     @NotNull
-    private String content;
+    private String value;
+
+    private String music;
 }

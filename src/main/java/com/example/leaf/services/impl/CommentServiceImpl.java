@@ -177,4 +177,32 @@ public class CommentServiceImpl implements CommentService {
                 CommentOfPostResponseDTO.class
         );
     }
+
+    @Override
+    public ListResponse<?> getListCommentOfPage(Integer page) {
+        List<Comment> listComment = commentRepository.findAll(
+                PageRequest.of(page-1, 20).withSort(Sort.by("createDate").descending())
+        ).getContent();
+
+        return serviceUtils.convertToListResponse(listComment, CommentResponseDTO.class);
+    }
+
+    @Override
+    public DataResponse<?> disableComment(String id) {
+        Comment comment = commentRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("Can't find comment")
+        );
+        comment.setStatus("DISABLE");
+
+        return serviceUtils.convertToDataResponse(commentRepository.save(comment), CommentResponseDTO.class);
+    }
+
+    @Override
+    public DataResponse<?> enableComment(String id) {
+        Comment comment = commentRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("Can't find comment")
+        );
+        comment.setStatus("ENABLE");
+        return serviceUtils.convertToDataResponse(commentRepository.save(comment), CommentResponseDTO.class);
+    }
 }

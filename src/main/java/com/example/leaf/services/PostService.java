@@ -36,4 +36,8 @@ public interface PostService {
     DataResponse<?> reactionPost(String postId, ReactionRequestDTO reactionRequestDTO, User user);
 
     DataResponse<?> unReactionPost(String postId, User user);
+
+    ListResponse<?> getListPostOfPage(Integer page);
+    DataResponse<?> disablePost(String id);
+    DataResponse<?> enablePost(String id);
 }

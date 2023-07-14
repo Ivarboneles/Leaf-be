@@ -316,6 +316,36 @@ public class UserServiceImpl implements UserService {
         return serviceUtils.convertToListResponse(postRepository.findAllByUserAndStatus(user, StatusEnum.ENABLE.toString(), Sort.by("createDate").descending()), PostOfUserResponseDTO.class);
     }
 
+    @Override
+    public ListResponse<?> getListUserOfPage(Integer page) {
+        List<User> listUser = userRepository.findAll(
+                PageRequest.of(page-1, 20).withSort(Sort.by("createDate").descending())
+        ).getContent();
+        return new ListResponse<>(listUser);
+    }
+
+    @Override
+    public DataResponse<?> disableUser(String username) {
+        User user = userRepository.findById(username).orElseThrow(
+                () -> new ResourceNotFoundException("Can't find user " + username)
+        );
+
+        user.setEnable(false);
+
+        return serviceUtils.convertToDataResponse(userRepository.save(user), UserResponseDTO.class);
+    }
+
+    @Override
+    public DataResponse<?> enableUser(String username) {
+        User user = userRepository.findById(username).orElseThrow(
+                () -> new ResourceNotFoundException("Can't find user " + username)
+        );
+
+        user.setEnable(true);
+
+        return serviceUtils.convertToDataResponse(userRepository.save(user), UserResponseDTO.class);
+    }
+
     private String generateVerifyCode(){
         Random random = new Random();
         int number1 = 100 + random.nextInt(999);

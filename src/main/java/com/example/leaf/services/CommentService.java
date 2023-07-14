@@ -23,4 +23,8 @@ public interface CommentService {
     ListResponse<?> getAllCommentByPostAndPageSize(String postId, Integer size);
 
     ListResponse<?> getAllCommentByFather(String fatherId);
+
+    ListResponse<?> getListCommentOfPage(Integer page);
+    DataResponse<?> disableComment(String id);
+    DataResponse<?> enableComment(String id);
 }

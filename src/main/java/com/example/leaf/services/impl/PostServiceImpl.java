@@ -298,6 +298,33 @@ public class PostServiceImpl implements PostService {
         return serviceUtils.convertToDataResponse(reactionPostRepository.save(reactionPost), ReactionPostResponseDTO.class);
     }
 
+    @Override
+    public ListResponse<?> getListPostOfPage(Integer page) {
+        List<Post> listPost = postRepository.findAll(
+                PageRequest.of(page-1, 20).withSort(Sort.by("createDate").descending())
+        ).getContent();
+
+        return serviceUtils.convertToListResponse(listPost, PostResponseDTO.class);
+    }
+
+    @Override
+    public DataResponse<?> disablePost(String id) {
+        Post post = postRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("Can't find post")
+        );
+        post.setStatus("DISABLE");
+        return serviceUtils.convertToDataResponse(postRepository.save(post), PostResponseDTO.class);
+    }
+
+    @Override
+    public DataResponse<?> enablePost(String id) {
+        Post post = postRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("Can't find post")
+        );
+        post.setStatus("ENABLE");
+        return serviceUtils.convertToDataResponse(postRepository.save(post), PostResponseDTO.class);
+    }
+
 
     void uploadFile(MultipartFile[] files, Post post, Integer[] type){
         try{
