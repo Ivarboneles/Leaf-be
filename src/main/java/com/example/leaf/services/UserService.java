@@ -35,6 +35,8 @@ public interface UserService {
     ListResponse<?> getListUserOfPage(Integer page);
     DataResponse<?> disableUser(String username);
     DataResponse<?> enableUser(String username);
+
+    DataResponse<?> getStatisticData();
 }
 
 

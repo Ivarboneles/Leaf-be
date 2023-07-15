@@ -3,6 +3,7 @@ package com.example.leaf.repositories;
 import com.example.leaf.repositories.model.ModelAI;
 import com.example.leaf.entities.User;
 import com.example.leaf.repositories.model.ModelCommonFriend;
+import com.example.leaf.repositories.model.ModelStatistic;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -102,4 +103,14 @@ public interface UserRepository extends JpaRepository<User, String> {
             "WHERE rating > (:rating/700)\n" +
             "ORDER BY user_id ASC, item_id ASC")
     List<ModelAI> getDataSourceForAI(@Param("rating") Integer rating);
+
+    @Query(nativeQuery = true, value = "SELECT MONTH(create_date) as month, COUNT(*) as count FROM leaf_db.user WHERE YEAR(create_date) = '2023' GROUP BY MONTH(create_date) ORDER BY month asc\n")
+    List<ModelStatistic> countUserEachMonth();
+
+    @Query(nativeQuery = true, value = "SELECT MONTH(create_date) as month, COUNT(*) as count FROM leaf_db.post WHERE YEAR(create_date) = '2023' GROUP BY MONTH(create_date) ORDER BY month asc\n")
+    List<ModelStatistic> countPostEachMonth();
+
+    @Query(nativeQuery = true, value = "SELECT MONTH(create_date) as month, COUNT(*) as count FROM leaf_db.comment WHERE YEAR(create_date) = '2023' GROUP BY MONTH(create_date) ORDER BY month asc\n")
+    List<ModelStatistic> countCommentEachMonth();
+
 }

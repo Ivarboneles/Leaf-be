@@ -218,42 +218,43 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public ListResponse<?> getNewFeedPost(Integer page, User user) {
-        List<Post> list = postRepository.findAllByStatus(StatusEnum.ENABLE.toString(),PageRequest.of(page-1, 15).withSort(Sort.by("createDate").descending())).getContent();
-//        List<Post> listResult = new ArrayList<>();
-//        try {
-//            List<User> listUser = serviceUtils.recommendUser(user);
-//            List<Post> posts = postRepository.findAllByUserAndStatus(
-//                    user,
-//                    StatusEnum.ENABLE.toString(),
-//                    PageRequest.of(page-1, 1).withSort(Sort.by("createDate").descending())
-//            ).getContent();
-//            if(!posts.isEmpty()){
-//                listResult.add(posts.get(0));
-//            }
-//            for (User item: listUser){
-//                List<Post> postList = postRepository.findAllByUserAndStatus(
-//                        item,
-//                        StatusEnum.ENABLE.toString(),
-//                        PageRequest.of(page-1, 1).withSort(Sort.by("createDate").descending())
-//                ).getContent();
-//
-//                if(!postList.isEmpty()) {
-//
-//                   listResult.add(postList.get(0));
-//                }
-//
-//                if(listResult.size() > 14){
-//                    break;
-//                }
-//            }
-//            if(listResult.size() < 15){
-//
-//            }
-//            return countCommentReactionPost(listResult, user);
-//        } catch (TasteException e) {
-//            throw new RuntimeException(e);
-//        }
-        return countCommentReactionPost(list, user);
+//        List<Post> list = postRepository.findAllByStatus(StatusEnum.ENABLE.toString(),PageRequest.of(page-1, 15).withSort(Sort.by("createDate").descending())).getContent();
+        List<Post> listResult = new ArrayList<>();
+        try {
+            List<User> listUser = serviceUtils.recommendUser(user);
+            List<Post> posts = postRepository.findAllByUserAndStatus(
+                    user,
+                    StatusEnum.ENABLE.toString(),
+                    PageRequest.of(page-1, 1).withSort(Sort.by("createDate").descending())
+            ).getContent();
+            if(!posts.isEmpty()){
+                listResult.add(posts.get(0));
+            }
+            for (User item: listUser){
+                List<Post> postList = postRepository.findAllByUserAndStatus(
+                        item,
+                        StatusEnum.ENABLE.toString(),
+                        PageRequest.of(page-1, 1).withSort(Sort.by("createDate").descending())
+                ).getContent();
+
+                if(!postList.isEmpty()) {
+
+                   listResult.add(postList.get(0));
+                }
+
+                if(listResult.size() > 14){
+                    break;
+                }
+            }
+
+            if(listResult.size() < 15){
+
+            }
+            return countCommentReactionPost(listResult, user);
+        } catch (TasteException e) {
+            throw new RuntimeException(e);
+        }
+//        return countCommentReactionPost(list, user);
     }
 
     @Override
@@ -335,7 +336,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public ListResponse<?> getListPostOfPage(Integer page) {
         List<Post> listPost = postRepository.findAll(
-                PageRequest.of(page-1, 20).withSort(Sort.by("createDate").descending())
+                PageRequest.of(page-1, 7).withSort(Sort.by("createDate").descending())
         ).getContent();
 
         return serviceUtils.convertToListResponse(listPost, PostResponseDTO.class);

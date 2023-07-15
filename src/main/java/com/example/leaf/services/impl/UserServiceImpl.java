@@ -11,11 +11,9 @@ import com.example.leaf.exceptions.InvalidValueException;
 import com.example.leaf.exceptions.ResourceAlreadyExistsException;
 import com.example.leaf.exceptions.ResourceNotFoundException;
 
-import com.example.leaf.repositories.PostRepository;
-import com.example.leaf.repositories.RelationShipRepository;
-import com.example.leaf.repositories.RoleRepository;
-import com.example.leaf.repositories.UserRepository;
+import com.example.leaf.repositories.*;
 import com.example.leaf.repositories.model.ModelCommonFriend;
+import com.example.leaf.repositories.model.ModelStatistic;
 import com.example.leaf.services.ImageService;
 import com.example.leaf.services.UserService;
 import com.example.leaf.utils.JwtTokenUtil;
@@ -71,6 +69,9 @@ public class UserServiceImpl implements UserService {
     RelationShipRepository relationShipRepository;
     @Autowired
     PostRepository postRepository;
+
+    @Autowired
+    CommentRepository commentRepository;
 
     @Autowired
     JwtTokenUtil jwtTokenUtil;
@@ -319,7 +320,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public ListResponse<?> getListUserOfPage(Integer page) {
         List<User> listUser = userRepository.findAll(
-                PageRequest.of(page-1, 20).withSort(Sort.by("createDate").descending())
+                PageRequest.of(page-1, 7).withSort(Sort.by("createDate").descending())
         ).getContent();
         return new ListResponse<>(listUser);
     }
@@ -344,6 +345,18 @@ public class UserServiceImpl implements UserService {
         user.setEnable(true);
 
         return serviceUtils.convertToDataResponse(userRepository.save(user), UserResponseDTO.class);
+    }
+
+    @Override
+    public DataResponse<?> getStatisticData() {
+        StatisticDataResponseDTO statisticDataResponseDTO = new StatisticDataResponseDTO();
+        statisticDataResponseDTO.setCountUser(userRepository.count());
+        statisticDataResponseDTO.setCountPost(postRepository.count());
+        statisticDataResponseDTO.setCountComment(commentRepository.count());
+        statisticDataResponseDTO.setCountUserOfMonth(userRepository.countUserEachMonth());
+        statisticDataResponseDTO.setCountPostOfMonth(userRepository.countPostEachMonth());
+        statisticDataResponseDTO.setCountCommentOfMonth(userRepository.countCommentEachMonth());
+        return new DataResponse<>(statisticDataResponseDTO);
     }
 
     private String generateVerifyCode(){

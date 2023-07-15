@@ -181,7 +181,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public ListResponse<?> getListCommentOfPage(Integer page) {
         List<Comment> listComment = commentRepository.findAll(
-                PageRequest.of(page-1, 20).withSort(Sort.by("createDate").descending())
+                PageRequest.of(page-1, 7).withSort(Sort.by("createDate").descending())
         ).getContent();
 
         return serviceUtils.convertToListResponse(listComment, CommentResponseDTO.class);
