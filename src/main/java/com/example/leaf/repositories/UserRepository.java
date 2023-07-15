@@ -104,7 +104,7 @@ public interface UserRepository extends JpaRepository<User, String> {
             "ORDER BY user_id ASC, item_id ASC")
     List<ModelAI> getDataSourceForAI(@Param("rating") Integer rating);
 
-    @Query(nativeQuery = true, value = "SELECT MONTH(create_date) as month, COUNT(*) as count FROM leaf_db.user WHERE YEAR(create_date) = '2023' GROUP BY MONTH(create_date) ORDER BY month asc\n")
+    @Query(nativeQuery = true, value = "SELECT MONTH(create_date) as month, COUNT(*) as count FROM leaf_db.user WHERE YEAR(create_date) = '2023' AND role_id = 'CUSTOMER' GROUP BY MONTH(create_date) ORDER BY month asc\n")
     List<ModelStatistic> countUserEachMonth();
 
     @Query(nativeQuery = true, value = "SELECT MONTH(create_date) as month, COUNT(*) as count FROM leaf_db.post WHERE YEAR(create_date) = '2023' GROUP BY MONTH(create_date) ORDER BY month asc\n")
