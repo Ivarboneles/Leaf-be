@@ -129,7 +129,7 @@ public class StoryServiceImpl implements StoryService {
                String fileName = imageService.save(file);
                String imageUrl = imageService.getImageUrl(fileName);
 
-               return fileName;
+               return imageUrl;
            }
 
            return  null;

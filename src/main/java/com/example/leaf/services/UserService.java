@@ -37,6 +37,8 @@ public interface UserService {
     DataResponse<?> enableUser(String username);
 
     DataResponse<?> getStatisticData();
+
+    ListResponse<?> uploadFileOfMessage(MultipartFile[] files);
 }
 
 

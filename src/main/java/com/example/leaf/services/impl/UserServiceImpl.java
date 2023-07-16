@@ -34,6 +34,7 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.transaction.Transactional;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -357,6 +358,36 @@ public class UserServiceImpl implements UserService {
         statisticDataResponseDTO.setCountPostOfMonth(userRepository.countPostEachMonth());
         statisticDataResponseDTO.setCountCommentOfMonth(userRepository.countCommentEachMonth());
         return new DataResponse<>(statisticDataResponseDTO);
+    }
+
+    @Override
+    public ListResponse<?> uploadFileOfMessage(MultipartFile[] files) {
+        List<String> listUrl = new ArrayList<>();
+
+        for(MultipartFile item : files){
+            String url = uploadFile(item);
+            if(url != null){
+                listUrl.add(url);
+            }
+        }
+        return new ListResponse<>(listUrl);
+    }
+
+    String uploadFile(MultipartFile file){
+        try{
+            //read file in files
+            if(file != null){
+                //Upload file
+                String fileName = imageService.save(file);
+                String imageUrl = imageService.getImageUrl(fileName);
+
+                return imageUrl;
+            }
+
+            return  null;
+        }catch (Exception e){
+            throw new InvalidValueException("Can't upload file : " + e.getMessage());
+        }
     }
 
     private String generateVerifyCode(){

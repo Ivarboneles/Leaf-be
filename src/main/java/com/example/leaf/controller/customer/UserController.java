@@ -126,4 +126,13 @@ public class UserController {
                 jwtTokenUtil.getUserDetails(JwtTokenUtil.getAccessToken(request))
         ));
     }
+
+
+    @PostMapping(value = "/upload-file",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+//    @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(encoding = @Encoding(name = "storyRequestDTO", contentType = "application/json")))
+    public ResponseEntity<?> uploadFileOfMessage(@RequestBody MultipartFile[] files){
+        return ResponseEntity.ok(userService.uploadFileOfMessage(
+                files
+        ));
+    }
 }
