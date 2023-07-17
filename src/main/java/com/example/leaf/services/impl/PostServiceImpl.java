@@ -25,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -218,43 +219,86 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public ListResponse<?> getNewFeedPost(Integer page, User user) {
-        List<Post> list = postRepository.findAllByStatus(StatusEnum.ENABLE.toString(),PageRequest.of(page-1, 15).withSort(Sort.by("createDate").descending())).getContent();
-//        List<Post> listResult = new ArrayList<>();
-//        try {
-//            List<User> listUser = serviceUtils.recommendUser(user);
-//            List<Post> posts = postRepository.findAllByUserAndStatus(
-//                    user,
-//                    StatusEnum.ENABLE.toString(),
-//                    PageRequest.of(page-1, 1).withSort(Sort.by("createDate").descending())
-//            ).getContent();
-//            if(!posts.isEmpty()){
-//                listResult.add(posts.get(0));
-//            }
-//            for (User item: listUser){
-//                List<Post> postList = postRepository.findAllByUserAndStatus(
-//                        item,
-//                        StatusEnum.ENABLE.toString(),
-//                        PageRequest.of(page-1, 1).withSort(Sort.by("createDate").descending())
-//                ).getContent();
-//
-//                if(!postList.isEmpty()) {
-//
-//                   listResult.add(postList.get(0));
-//                }
-//
-//                if(listResult.size() > 14){
-//                    break;
-//                }
-//            }
-//
-//            if(listResult.size() < 15){
-//
-//            }
-//            return countCommentReactionPost(listResult, user);
-//        } catch (TasteException e) {
-//            throw new RuntimeException(e);
-//        }
-        return countCommentReactionPost(list, user);
+//        List<Post> list = postRepository.findAllByStatus(StatusEnum.ENABLE.toString(),PageRequest.of(page-1, 15).withSort(Sort.by("createDate").descending())).getContent();
+        List<Post> listResult = new ArrayList<>();
+        List<User> listUser = new ArrayList<>();
+        try {
+            listUser = serviceUtils.recommendUser(user);
+            listUser.add(user);
+
+            for (User item: listUser){
+                List<Post> postList = postRepository.findAllByUserAndStatus(
+                        item,
+                        StatusEnum.ENABLE.toString(),
+                        Sort.by("createDate").descending()
+                );
+
+                listResult.addAll(postList);
+            }
+
+            if(listResult.size() < 30){
+                List<RelationShip> relationShipList = relationShipRepository.findAllByUserFromOrUserToAndStatus(
+                        user,
+                        user,
+                        StatusEnum.ENABLE.toString(),
+                        PageRequest.of(page-1, 15).withSort(Sort.by("createDate").descending())
+                ).getContent();
+
+                for(RelationShip relationShip : relationShipList){
+                    User friend = relationShip.getUserFrom();
+
+                    if(friend == user){
+                        friend = relationShip.getUserTo();
+                    }
+
+                    if(!listUser.contains(friend)){
+                        List<Post> postList = postRepository.findAllByUserAndStatus(
+                                friend,
+                                StatusEnum.ENABLE.toString(),
+                                Sort.by("createDate").descending()
+                        );
+
+                        listResult.addAll(postList);
+                    }
+
+                    if(listResult.size() > 59){
+                        break;
+                    }
+                }
+            }
+
+            if(listResult.size() < 1){
+                listResult = postRepository.findAllByStatus(StatusEnum.ENABLE.toString(),
+                        PageRequest.of(page-1, 6).withSort(Sort.by("createDate").descending())
+                ).getContent();
+
+                return countCommentReactionPost(listResult, user);
+            }
+
+            listResult = listResult
+                    .stream()
+                    .sorted((t1, t2) -> {
+                        if (t1.getCreateDate().toInstant().isAfter(t2.getCreateDate().toInstant()) ) {
+                            return -1;
+                        }
+                        return 1;
+                    })
+                    .collect(Collectors.toList());
+
+//            return countCommentReactionPost(listResult.subList((page-1)*15, 15*page), user);
+            Integer count = listResult.size();
+            if((page-1)*6 > count - 1){
+                return new ListResponse<>(new ArrayList<>());
+            }
+
+            if(page*6 > count){
+                return countCommentReactionPost(listResult.subList((page-1)*6, count), user);
+            }
+            return countCommentReactionPost(listResult.subList((page-1)*6, 6*page), user);
+        } catch (TasteException e) {
+            throw new RuntimeException(e);
+        }
+//        return countCommentReactionPost(list, user);
     }
 
     @Override

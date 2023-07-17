@@ -12,6 +12,7 @@ import java.util.Optional;
 
 public interface RelationShipRepository extends JpaRepository<RelationShip, RelationShipKey> {
     List<RelationShip> findAllByUserFromOrUserToAndStatus(User userFrom, User userTo, String status);
+
     Page<RelationShip> findAllByUserFromOrUserToAndStatus(User userFrom, User userTo, String status, Pageable pageable);
     List<RelationShip> findAllByUserToAndStatus(User userTo, String status);
 
